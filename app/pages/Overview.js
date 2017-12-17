@@ -174,23 +174,27 @@ export default class FirstPage extends Component {
     }
 
     handlePress(param) {
-        this.setState({
-            burnDownChartTime: param[0].name,
-            burnDownChartActual: param[0].value,
-            burnDownChartIdeal: param[1].value,
-        });
+        if (param instanceof Array) {
+            this.setState({
+                burnDownChartTime: param[0].name,
+                burnDownChartActual: param[0].value,
+                burnDownChartIdeal: param[1].value,
+            });
+        }
     }
 
     handlePress2(param) {
-        this.setState({
-            accumulativeFlowGraphTime: param[0].name,
-            accumulativeFlowGraph1: param[0].value,
-            accumulativeFlowGraph2: param[1].value,
-            accumulativeFlowGraph3: param[2].value,
-            accumulativeFlowGraph4: param[3].value,
-            accumulativeFlowGraph5: param[4].value,
-            accumulativeFlowGraph6: param[5].value,
-        });
+        if (param instanceof Array) {
+            this.setState({
+                accumulativeFlowGraphTime: param[0].name,
+                accumulativeFlowGraph1: param[0].value,
+                accumulativeFlowGraph2: param[1].value,
+                accumulativeFlowGraph3: param[2].value,
+                accumulativeFlowGraph4: param[3].value,
+                accumulativeFlowGraph5: param[4].value,
+                accumulativeFlowGraph6: param[5].value,
+            });
+        }
     }
 
     render() {

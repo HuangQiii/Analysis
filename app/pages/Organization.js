@@ -122,19 +122,23 @@ export default class FirstPage extends Component {
     }
 
     handlePressMember(param) {
-        console.log(param)
-        this.setState({
-            memberTime: param[0].name,
-            member1: param[0].value,
-            member2: param[1].value,
-        });
+        if (param instanceof Array) {
+            console.log(param)
+            this.setState({
+                memberTime: param[0].name,
+                member1: param[0].value,
+                member2: param[1].value,
+            });
+        }
     }
 
     handlePressNumber(param) {
-        console.log(param)
-        this.setState({
-            number: param.data
-        });
+        if (param instanceof Array) {
+            console.log(param)
+            this.setState({
+                number: param.data
+            });
+        }
     }
 
     render() {

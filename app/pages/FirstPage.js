@@ -783,11 +783,13 @@ export default class FirstPage extends Component {
     }
 
     handlePressServer(param) {
-        this.setState({
-            serverTime: param[0].name,
-            server1: param[0].value,
-            server2: param[1].value,
-        });
+        if (param instanceof Array) {
+            this.setState({
+                serverTime: param[0].name,
+                server1: param[0].value,
+                server2: param[1].value,
+            });
+        }
     }
 
     render() {
