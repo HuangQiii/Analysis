@@ -267,7 +267,7 @@ export default class FirstPage extends Component {
                                     />
                                 </View>
                                 <View style={{ flex: 1 }}>
-                                    <Text style={styles.fontNormal}>时间</Text>
+                                    <Text style={styles.fontNormal}>数据采集时间</Text>
                                 </View>
                                 <Text>{this.state.memberTime}</Text>
                             </View>
