@@ -32,7 +32,7 @@ export default class Guide extends Component {
 
     constructor(props) {
         super(props);
-        console.log('guide props: ', this.props.screenProps.proId);
+        console.log('guide props: ', this.props.screenProps);
     }
 
     componentDidMount() {

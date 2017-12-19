@@ -141,21 +141,22 @@ App.router.getStateForAction = (action, state) => {
 
 // export default App;
 
-class Routerr extends Component {
+class Router extends Component {
     constructor(props, context) {
         super(props, context);
         console.log('app props: ', this.props);
     }
 
-    _getProps() {
+    getProps() {
         return {
-            proId: this.props.proId
+            proId: this.props.proId,
+            orgId: this.props.orgId
         }
     }
 
     render() {
-        return <App screenProps={this._getProps()} />;
+        return <App screenProps={this.getProps()} />;
     }
 }
 
-export default Routerr;
+export default Router;

@@ -36,6 +36,7 @@ export default class Overview extends Component {
 
     constructor(props) {
         super(props);
+        console.log('overview props: ', this.props.screenProps);
 
         this.state = {
             burnDownOption: {},

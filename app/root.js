@@ -1,6 +1,5 @@
-// 此处可以引入react-redux和store和saga等
 import React, { Component } from 'react';
-import Routerr from './containers/app';
+import Router from './containers/app';
 
 class Root extends Component {
     constructor(props, context) {
@@ -10,7 +9,10 @@ class Root extends Component {
 
     render() {
         return (
-            <Routerr proId={this.props.proId} />
+            <Router
+                orgId={this.props.orgId}
+                proId={this.props.proId}
+            />
         );
     }
 }
