@@ -1,15 +1,14 @@
-import React, { Component, } from 'react';
-import { ScrollView, View, Dimensions, StyleSheet, Text, Image, TouchableOpacity, ListView, TouchableHighlight } from 'react-native';
-import { NativeModules } from 'react-native';
-import List from '../components/List';
-import Icon from 'react-native-vector-icons/Ionicons';
+import React, { Component } from 'react';
+import { Dimensions, ScrollView, View, Text, StyleSheet, NativeModules } from 'react-native';
+import Label from '../components/Label';
+import Line from '../components/Line';
 import Echarts from 'native-echarts';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const { width, height } = Dimensions.get('window');
-export default class FirstPage extends Component {
+export default class Overview extends Component {
 
     static navigationOptions = ({ navigation }) => ({
-        title: `概览`,
         headerLeft: (
             <Icon.Button
                 name="md-menu"
@@ -39,10 +38,12 @@ export default class FirstPage extends Component {
         super(props);
 
         this.state = {
+            burnDownOption: {},
+            accumulativeFlowGraphOption: {},
+
             burnDownChartTime: '',
             burnDownChartActual: '',
             burnDownChartIdeal: '',
-            burnDownChartSelected: '',
 
             accumulativeFlowGraphTime: '',
             accumulativeFlowGraph1: '',
@@ -51,19 +52,16 @@ export default class FirstPage extends Component {
             accumulativeFlowGraph4: '',
             accumulativeFlowGraph5: '',
             accumulativeFlowGraph6: '',
-
-            option1: {},
-            option: {}
         };
     }
 
     componentDidMount() {
-        this.getNumber()
+        this.getData()
     }
 
-    getNumber() {
+    getData() {
         this.setState({
-            option1: {
+            burnDownOption: {
                 animation: true,
                 tooltip: {
                     trigger: 'axis',
@@ -103,7 +101,7 @@ export default class FirstPage extends Component {
                     },
                 ]
             },
-            option: {
+            accumulativeFlowGraphOption: {
                 animation: true,
                 tooltip: {
                     trigger: 'axis',
@@ -173,7 +171,7 @@ export default class FirstPage extends Component {
         })
     }
 
-    handlePress(param) {
+    handleBurnDownPress(param) {
         if (param instanceof Array) {
             this.setState({
                 burnDownChartTime: param[0].name,
@@ -183,7 +181,7 @@ export default class FirstPage extends Component {
         }
     }
 
-    handlePress2(param) {
+    handleAccumulativeFlowGraphPress(param) {
         if (param instanceof Array) {
             this.setState({
                 accumulativeFlowGraphTime: param[0].name,
@@ -198,52 +196,50 @@ export default class FirstPage extends Component {
     }
 
     render() {
-
-
-        const { navigate } = this.props.navigation;
         return (
             <ScrollView>
                 <View style={styles.container}>
-                    <View style={[styles.panel,]}>
+                    <View style={styles.panel}>
                         <View style={{ height: 38, }}>
                             <Text style={[styles.fontNormal, { marginTop: -4 }]}>服务监控信息</Text>
                         </View>
                         <View style={[styles.serviceMonitoringData]}>
                             <View style={styles.count}>
                                 <View style={styles.countColumn}>
-                                    <View style={{ flexDirection: 'row' }}>
-                                        <Text style={[styles.fontNormal, { marginTop: 1 }]}>部署频率</Text>
-                                        <Text style={[styles.fontNormal, { fontSize: 24, marginTop: -8, marginLeft: 8, marginRight: 8, fontWeight: '500' }]}>29</Text>
-                                        <Text style={[styles.fontNormal, { fontSize: 10, color: 'rgba(0,0,0,0.43)', marginTop: 5 }]}>/天</Text>
-                                    </View>
-                                    <View style={{ flexDirection: 'row', marginTop: 10 }}>
-                                        <Text style={[styles.fontNormal, { marginTop: 1 }]}>变更时长</Text>
-                                        <Text style={[styles.fontNormal, { fontSize: 24, marginTop: -8, marginLeft: 8, marginRight: 8, fontWeight: '500' }]}>29</Text>
-                                        <Text style={[styles.fontNormal, { fontSize: 10, color: 'rgba(0,0,0,0.43)', marginTop: 5 }]}>/小时</Text>
-                                    </View>
-
+                                    <Label
+                                        text={'部署频率'}
+                                        number={29}
+                                        unit={'/天'}
+                                    />
+                                    <Label
+                                        text={'变更时长'}
+                                        number={29}
+                                        marginTop={10}
+                                        unit={'/小时'}
+                                    />
                                 </View>
                                 <View style={styles.countColumn}>
-                                    <View style={{ flexDirection: 'row', marginTop: 1 }}>
-                                        <Text style={[styles.fontNormal, { marginTop: 1 }]}>变更完成率</Text>
-                                        <Text style={[styles.fontNormal, { fontSize: 24, marginTop: -8, marginLeft: 8, marginRight: 8, fontWeight: '500' }]}>29</Text>
-                                        <Text style={[styles.fontNormal, { fontSize: 10, color: 'rgba(0,0,0,0.43)', marginTop: 5 }]}>%</Text>
-                                    </View>
-                                    <View style={{ flexDirection: 'row', marginTop: 10 }}>
-                                        <Text style={[styles.fontNormal, { marginTop: 1 }]}>问题平均处理时长</Text>
-                                        <Text style={[styles.fontNormal, { fontSize: 24, marginTop: -8, marginLeft: 8, marginRight: 8, fontWeight: '500' }]}>8</Text>
-                                        <Text style={[styles.fontNormal, { fontSize: 10, color: 'rgba(0,0,0,0.43)', marginTop: 5 }]}>/小时</Text>
-                                    </View>
+                                    <Label
+                                        text={'变更完成率'}
+                                        number={29}
+                                        unit={'%'}
+                                    />
+                                    <Label
+                                        text={'问题平均处理时长'}
+                                        number={8}
+                                        marginTop={10}
+                                        unit={'小时'}
+                                    />
                                 </View>
                             </View>
                         </View>
                     </View>
-                    <View style={[styles.panel,]}>
+                    <View style={styles.panel}>
                         <View style={{ height: 38, }}>
                             <Text style={[styles.fontNormal, { marginTop: -4 }]}>燃尽图</Text>
                         </View>
                         <View>
-                            <Text style={[styles.fontNormal, { color: 'rgba(0,0,0,0.54)', marginTop: -4, }]}>冲刺： 1025 - 1125 XXX</Text>
+                            <Text style={[styles.fontNormal, { color: 'rgba(0,0,0,0.54)', marginTop: -4, }]}>冲刺： 2017/12/11 —— 2017/12/15   日常冲刺</Text>
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
                                 <View style={{ paddingRight: 11, justifyContent: 'center' }}>
                                     <Icon
@@ -262,37 +258,27 @@ export default class FirstPage extends Component {
                                 </View>
                                 <Text>{this.state.burnDownChartTime}</Text>
                             </View>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
-                                <View style={{ paddingRight: 9, justifyContent: 'center' }}>
-                                    <Text style={{ color: '#F44336', fontSize: 16, marginLeft: -2, marginTop: -1 }}>●</Text>
-                                </View>
-                                <View style={{ flex: 1 }}>
-                                    <Text style={styles.fontNormal}>实际值</Text>
-                                </View>
-                                <Text>{this.state.burnDownChartActual}</Text>
-                            </View>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
-                                <View style={{ paddingRight: 9, justifyContent: 'center' }}>
-                                    <Text style={{ color: 'rgba(0,0,0,0.26)', fontSize: 16, marginLeft: -2, marginTop: -1 }}>●</Text>
-                                </View>
-                                <View style={{ flex: 1 }}>
-                                    <Text style={styles.fontNormal}>期望值</Text>
-                                </View>
-                                <Text>{this.state.burnDownChartIdeal}</Text>
-                            </View>
+                            <Line
+                                text={'实际值'}
+                                color={'#F44336'}
+                                value={this.state.burnDownChartActual.toString()}
+                            />
+                            <Line
+                                text={'期望值'}
+                                value={this.state.burnDownChartIdeal.toString()}
+                            />
                             <View style={{ flexDirection: 'row', height: 220, marginTop: -30, marginLeft: -12, }}>
-                                <Echarts option={this.state.option1} height={250} width={width} onPress={(param) => { this.handlePress(param) }} />
+                                <Echarts option={this.state.burnDownOption} height={250} width={width} onPress={(param) => { this.handleBurnDownPress(param) }} />
                             </View>
 
                         </View>
                     </View>
-
-                    <View style={[styles.panel, { marginBottom: 10 }]}>
+                    <View style={styles.panel}>
                         <View style={{ height: 38 }}>
                             <Text style={[styles.fontNormal, { marginTop: -4 }]}>累计流图</Text>
                         </View>
                         <View>
-                            <Text style={[styles.fontNormal, { color: 'rgba(0,0,0,0.54)', marginTop: -4 }]}>冲刺： 1025 - 1125 XXX</Text>
+                            <Text style={[styles.fontNormal, { color: 'rgba(0,0,0,0.54)', marginTop: -4 }]}>冲刺： 2017/12/11 —— 2017/12/15   日常冲刺</Text>
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
                                 <View style={{ paddingRight: 11, justifyContent: 'center' }}>
                                     <Icon
@@ -311,68 +297,42 @@ export default class FirstPage extends Component {
                                 </View>
                                 <Text>{this.state.accumulativeFlowGraphTime}</Text>
                             </View>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
-                                <View style={{ paddingRight: 9, justifyContent: 'center' }}>
-                                    <Text style={{ color: '#F4B400', fontSize: 16, marginLeft: -2, marginTop: -1 }}>●</Text>
-                                </View>
-                                <View style={{ flex: 1 }}>
-                                    <Text style={styles.fontNormal}>完成</Text>
-                                </View>
-                                <Text>{this.state.accumulativeFlowGraph1}</Text>
-                            </View>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
-                                <View style={{ paddingRight: 9, justifyContent: 'center' }}>
-                                    <Text style={{ color: '#FF7043', fontSize: 16, marginLeft: -2, marginTop: -1 }}>●</Text>
-                                </View>
-                                <View style={{ flex: 1 }}>
-                                    <Text style={styles.fontNormal}>测试</Text>
-                                </View>
-                                <Text>{this.state.accumulativeFlowGraph2}</Text>
-                            </View>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
-                                <View style={{ paddingRight: 9, justifyContent: 'center' }}>
-                                    <Text style={{ color: '#4D90FE', fontSize: 16, marginLeft: -2, marginTop: -1 }}>●</Text>
-                                </View>
-                                <View style={{ flex: 1 }}>
-                                    <Text style={styles.fontNormal}>开发</Text>
-                                </View>
-                                <Text>{this.state.accumulativeFlowGraph3}</Text>
-                            </View>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
-                                <View style={{ paddingRight: 9, justifyContent: 'center' }}>
-                                    <Text style={{ color: '#F953BA', fontSize: 16, marginLeft: -2, marginTop: -1 }}>●</Text>
-                                </View>
-                                <View style={{ flex: 1 }}>
-                                    <Text style={styles.fontNormal}>待开发</Text>
-                                </View>
-                                <Text>{this.state.accumulativeFlowGraph4}</Text>
-                            </View>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
-                                <View style={{ paddingRight: 9, justifyContent: 'center' }}>
-                                    <Text style={{ color: '#1BC123', fontSize: 16, marginLeft: -2, marginTop: -1 }}>●</Text>
-                                </View>
-                                <View style={{ flex: 1 }}>
-                                    <Text style={styles.fontNormal}>设计</Text>
-                                </View>
-                                <Text>{this.state.accumulativeFlowGraph5}</Text>
-                            </View>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
-                                <View style={{ paddingRight: 9, justifyContent: 'center' }}>
-                                    <Text style={{ color: '#743BE7', fontSize: 16, marginLeft: -2, marginTop: -1 }}>●</Text>
-                                </View>
-                                <View style={{ flex: 1 }}>
-                                    <Text style={styles.fontNormal}>需求</Text>
-                                </View>
-                                <Text>{this.state.accumulativeFlowGraph6}</Text>
-                            </View>
-
+                            <Line
+                                text={'完成'}
+                                value={this.state.accumulativeFlowGraph1.toString()}
+                                color={'#F4B400'}
+                            />
+                            <Line
+                                text={'测试'}
+                                value={this.state.accumulativeFlowGraph2.toString()}
+                                color={'#FF7043'}
+                            />
+                            <Line
+                                text={'开发'}
+                                value={this.state.accumulativeFlowGraph3.toString()}
+                                color={'#4D90FE'}
+                            />
+                            <Line
+                                text={'待开发'}
+                                value={this.state.accumulativeFlowGraph4.toString()}
+                                color={'#F953BA'}
+                            />
+                            <Line
+                                text={'设计'}
+                                value={this.state.accumulativeFlowGraph5.toString()}
+                                color={'#1BC123'}
+                            />
+                            <Line
+                                text={'需求'}
+                                value={this.state.accumulativeFlowGraph6.toString()}
+                                color={'#743BE7'}
+                            />
                             <View style={{ flexDirection: 'row', height: 220, marginTop: -30, marginLeft: -12, }}>
-                                <Echarts option={this.state.option} height={250} width={width} onPress={(param) => { this.handlePress2(param) }} />
+                                <Echarts option={this.state.accumulativeFlowGraphOption} height={250} width={width} onPress={(param) => { this.handleAccumulativeFlowGraphPress(param) }} />
                             </View>
 
                         </View>
                     </View>
-                    {/*<Echarts option={option} height={260} width={width - 48} />*/}
                 </View >
             </ScrollView >
         );
@@ -382,14 +342,14 @@ export default class FirstPage extends Component {
 var styles = StyleSheet.create({
     container: {
         flex: 1,
-        // height: height,
         backgroundColor: '#F1F1F2',
-        flexDirection: 'column'
+        flexDirection: 'column',
+        paddingTop: 10
     },
     panel: {
         backgroundColor: 'rgba(255,255,255,0.87)',
         margin: 10,
-        marginBottom: 0,
+        marginTop: 0,
         padding: 12,
         paddingBottom: 16,
         elevation: 1
@@ -402,15 +362,8 @@ var styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row'
     },
-    alarm: {
-        // height: 51,
-        width: 74,
-        alignItems: 'center',
-        justifyContent: 'space-between'
-    },
     count: {
         flex: 1,
-        // height: 51,
         flexDirection: 'row',
         paddingLeft: 8,
         paddingRight: 8,

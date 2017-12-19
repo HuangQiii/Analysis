@@ -1,9 +1,12 @@
 import React, { Component, } from 'react';
-import { ScrollView, View, Dimensions, StyleSheet, Text, Image, TouchableOpacity, ListView, TouchableHighlight } from 'react-native';
-import { NativeModules } from 'react-native';
+import { ScrollView, View, Dimensions, StyleSheet, Text, NativeModules } from 'react-native';
 import List from '../components/List';
+import Label from '../components/Label';
+import Tab from '../components/Tab';
+import Line from '../components/Line';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Echarts from 'native-echarts';
+
 var option1 = {
     animation: true,
     tooltip: {
@@ -102,8 +105,6 @@ export default class FirstPage extends Component {
                 backgroundColor="transparent"
                 underlayColor="transparent"
                 activeOpacity={1}
-                onPress={() => {
-                }}
             />
         )
     });
@@ -133,50 +134,49 @@ export default class FirstPage extends Component {
     }
 
     handlePressNumber(param) {
-        if (param instanceof Array) {
-            console.log(param)
-            this.setState({
-                number: param.data
-            });
-        }
+
+        console.log(param)
+        this.setState({
+            number: param.data
+        });
+
     }
 
     render() {
-
-        const { navigate } = this.props.navigation;
         return (
             <ScrollView>
                 <View style={styles.container}>
-                    <View style={[styles.panel,]}>
+                    <View style={styles.panel}>
                         <View style={{ height: 38, }}>
-                            <Text style={[styles.fontNormal, { marginTop: -4 }]}>组织监控信息</Text>
+                            <Text style={[styles.fontNormal, { marginTop: -4 }]}>服务监控信息</Text>
                         </View>
                         <View style={[styles.serviceMonitoringData]}>
                             <View style={styles.count}>
                                 <View style={styles.countColumn}>
-                                    <View style={{ flexDirection: 'row' }}>
-                                        <Text style={[styles.fontNormal, { marginTop: 1 }]}>部署频率</Text>
-                                        <Text style={[styles.fontNormal, { fontSize: 24, marginTop: -8, marginLeft: 8, marginRight: 8, fontWeight: '500', color: '#3F51B5' }]}>29</Text>
-                                        <Text style={[styles.fontNormal, { fontSize: 10, color: 'rgba(0,0,0,0.43)', marginTop: 5 }]}>/天</Text>
-                                    </View>
-                                    <View style={{ flexDirection: 'row', marginTop: 10 }}>
-                                        <Text style={[styles.fontNormal, { marginTop: 1 }]}>变更时长</Text>
-                                        <Text style={[styles.fontNormal, { fontSize: 24, marginTop: -8, marginLeft: 8, marginRight: 8, fontWeight: '500', color: '#3F51B5' }]}>29</Text>
-                                        <Text style={[styles.fontNormal, { fontSize: 10, color: 'rgba(0,0,0,0.43)', marginTop: 5 }]}>/小时</Text>
-                                    </View>
-
+                                    <Label
+                                        text={'部署频率'}
+                                        number={29}
+                                        unit={'/天'}
+                                    />
+                                    <Label
+                                        text={'变更时长'}
+                                        number={29}
+                                        marginTop={10}
+                                        unit={'/小时'}
+                                    />
                                 </View>
                                 <View style={styles.countColumn}>
-                                    <View style={{ flexDirection: 'row', marginTop: 1 }}>
-                                        <Text style={[styles.fontNormal, { marginTop: 1 }]}>变更完成率</Text>
-                                        <Text style={[styles.fontNormal, { fontSize: 24, marginTop: -8, marginLeft: 8, marginRight: 8, fontWeight: '500', color: '#3F51B5' }]}>29</Text>
-                                        <Text style={[styles.fontNormal, { fontSize: 10, color: 'rgba(0,0,0,0.43)', marginTop: 5 }]}>%</Text>
-                                    </View>
-                                    <View style={{ flexDirection: 'row', marginTop: 10 }}>
-                                        <Text style={[styles.fontNormal, { marginTop: 1 }]}>问题平均处理时长</Text>
-                                        <Text style={[styles.fontNormal, { fontSize: 24, marginTop: -8, marginLeft: 8, marginRight: 8, fontWeight: '500', color: '#3F51B5' }]}>8</Text>
-                                        <Text style={[styles.fontNormal, { fontSize: 10, color: 'rgba(0,0,0,0.43)', marginTop: 5 }]}>/小时</Text>
-                                    </View>
+                                    <Label
+                                        text={'变更完成率'}
+                                        number={29}
+                                        unit={'%'}
+                                    />
+                                    <Label
+                                        text={'问题平均处理时长'}
+                                        number={8}
+                                        marginTop={10}
+                                        unit={'小时'}
+                                    />
                                 </View>
                             </View>
                         </View>
@@ -223,21 +223,28 @@ export default class FirstPage extends Component {
                             </View>
                         </View>
                     </View>
-                    <View style={[styles.panel,]}>
+                    <View style={styles.panel}>
                         <View style={{ height: 38, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                             <Text style={styles.fontNormal}>人员投入趋势</Text>
                         </View>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                             <View style={{ flexDirection: 'row' }}>
-                                <View style={{ height: 30, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(211,211,211,1)', borderBottomWidth: 3, borderBottomColor: '#3F51B5' }}>
-                                    <Text style={{ paddingLeft: 12, paddingRight: 12, color: 'rgba(0,0,0,0.9)' }}>近7天</Text>
-                                </View>
-                                <View style={{ height: 30, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(211,211,211,1)', borderLeftWidth: 0 }}>
-                                    <Text style={{ paddingLeft: 12, paddingRight: 12, }}>近30天</Text>
-                                </View>
-                                <View style={{ height: 30, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(211,211,211,1)', borderLeftWidth: 0 }}>
-                                    <Text style={{ paddingLeft: 12, paddingRight: 12, }}>全年</Text>
-                                </View>
+                                <Tab
+                                    text={'近7天'}
+                                    borderLeftWidth={1}
+                                    onPress={() => this.changeTime('近7天')}
+                                    active={this.state.nowTime === '近7天'}
+                                />
+                                <Tab
+                                    text={'近30天'}
+                                    onPress={() => this.changeTime('近30天')}
+                                    active={this.state.nowTime === '近30天'}
+                                />
+                                <Tab
+                                    text={'全年'}
+                                    onPress={() => this.changeTime('全年')}
+                                    active={this.state.nowTime === '全年'}
+                                />
                             </View>
                             <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', }}>
                                 <Icon
@@ -271,45 +278,42 @@ export default class FirstPage extends Component {
                                 </View>
                                 <Text>{this.state.memberTime}</Text>
                             </View>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
-                                <View style={{ paddingRight: 9, justifyContent: 'center' }}>
-                                    <Text style={{ color: '#1BC123', fontSize: 16, marginLeft: -2, marginTop: -1 }}>●</Text>
-                                </View>
-                                <View style={{ flex: 1 }}>
-                                    <Text style={styles.fontNormal}>项目投入人员</Text>
-                                </View>
-                                <Text>{this.state.member1}</Text>
-                            </View>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
-                                <View style={{ paddingRight: 9, justifyContent: 'center' }}>
-                                    <Text style={{ color: 'rgba(0,0,0,0.26)', fontSize: 16, marginLeft: -2, marginTop: -1 }}>●</Text>
-                                </View>
-                                <View style={{ flex: 1 }}>
-                                    <Text style={styles.fontNormal}>项目开发人员</Text>
-                                </View>
-                                <Text>{this.state.member2}</Text>
-                            </View>
+                            <Line
+                                text={'项目投入人员'}
+                                value={this.state.member1.toString()}
+                                color={'#1BC123'}
+                            />
+                            <Line
+                                text={'项目开发人员'}
+                                value={this.state.member2.toString()}
+                            />
                             <View style={{ flexDirection: 'row', height: 220, marginTop: -30, marginLeft: -12, }}>
                                 <Echarts option={this.state.chart1} height={250} width={width} onPress={(param) => { this.handlePressMember(param) }} />
                             </View>
-
                         </View>
                     </View>
-                    <View style={[styles.panel, { marginBottom: 10 }]}>
+                    <View style={styles.panel}>
                         <View style={{ height: 38, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                             <Text style={styles.fontNormal}>Top10构建数项目</Text>
                         </View>
                         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                             <View style={{ flexDirection: 'row' }}>
-                                <View style={{ height: 30, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(211,211,211,1)', borderBottomWidth: 3, borderBottomColor: '#3F51B5' }}>
-                                    <Text style={{ paddingLeft: 12, paddingRight: 12, color: 'rgba(0,0,0,0.9)' }}>近7天</Text>
-                                </View>
-                                <View style={{ height: 30, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(211,211,211,1)', borderLeftWidth: 0 }}>
-                                    <Text style={{ paddingLeft: 12, paddingRight: 12, }}>近30天</Text>
-                                </View>
-                                <View style={{ height: 30, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(211,211,211,1)', borderLeftWidth: 0 }}>
-                                    <Text style={{ paddingLeft: 12, paddingRight: 12, }}>全年</Text>
-                                </View>
+                                <Tab
+                                    text={'近7天'}
+                                    borderLeftWidth={1}
+                                    onPress={() => this.changeTime('近7天')}
+                                    active={this.state.nowTime === '近7天'}
+                                />
+                                <Tab
+                                    text={'近30天'}
+                                    onPress={() => this.changeTime('近30天')}
+                                    active={this.state.nowTime === '近30天'}
+                                />
+                                <Tab
+                                    text={'全年'}
+                                    onPress={() => this.changeTime('全年')}
+                                    active={this.state.nowTime === '全年'}
+                                />
                             </View>
                             <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', }}>
                                 <Icon
@@ -344,15 +348,12 @@ export default class FirstPage extends Component {
                                 </View>
                                 <Text>D项目</Text>
                             </View>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
-                                <View style={{ paddingRight: 9, justifyContent: 'center' }}>
-                                    <Text style={{ color: '#3A76D8', fontSize: 16, marginLeft: -2, marginTop: -1 }}>●</Text>
-                                </View>
-                                <View style={{ flex: 1 }}>
-                                    <Text style={styles.fontNormal}>构建数</Text>
-                                </View>
-                                <Text>{this.state.number}</Text>
-                            </View>
+
+                            <Line
+                                text={'构建数'}
+                                color={'#3A76D8'}
+                                value={this.state.number}
+                            />
                             <View style={{ flexDirection: 'row', height: 220, marginTop: -30, marginLeft: -12, }}>
                                 <Echarts option={this.state.chart} height={250} width={width} onPress={(param) => { this.handlePressNumber(param) }} />
                             </View>
@@ -368,14 +369,14 @@ export default class FirstPage extends Component {
 var styles = StyleSheet.create({
     container: {
         flex: 1,
-        // height: height,
         backgroundColor: '#F1F1F2',
-        flexDirection: 'column'
+        flexDirection: 'column',
+        paddingTop: 10,
     },
     panel: {
         backgroundColor: 'rgba(255,255,255,0.87)',
         margin: 10,
-        marginBottom: 0,
+        marginTop: 0,
         padding: 12,
         paddingBottom: 16,
         elevation: 1
@@ -389,14 +390,12 @@ var styles = StyleSheet.create({
         flexDirection: 'row'
     },
     alarm: {
-        // height: 51,
         width: 74,
         alignItems: 'center',
         justifyContent: 'space-between'
     },
     count: {
         flex: 1,
-        // height: 51,
         flexDirection: 'row',
         paddingLeft: 8,
         paddingRight: 8,

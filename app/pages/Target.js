@@ -1,10 +1,8 @@
 import React, { Component, } from 'react';
-import { View, Dimensions, StyleSheet, Text, Image, TouchableOpacity, ListView, DeviceEventEmitter } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
+import { View, StyleSheet, ListView, NativeModules } from 'react-native';
 import List from '../components/List';
 import Button from '../components/Button';
-import { StackNavigator, NavigationActions } from 'react-navigation';
-import { NativeModules } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const PRE_PRO = [
     { id: 0, name: '服务提交次数/失败次数' },
@@ -12,8 +10,7 @@ const PRE_PRO = [
     { id: 2, name: '服务部署次数/失败次数' },
     { id: 3, name: '服务发布次数/失败次数' },
 ];
-const { width, height } = Dimensions.get('window');
-export default class Total extends Component {
+export default class Target extends Component {
 
     static navigationOptions = ({ navigation }) => ({
         title: `选择指标`,
@@ -38,26 +35,25 @@ export default class Total extends Component {
     }
 
     componentDidMount() {
-        this.getMessage();
+        this.getData();
     }
 
-    getMessage() {
+    getData() {
         this.setState({
             dataSource: this.state.dataSource.cloneWithRows(PRE_PRO)
         })
     }
 
     select(list) {
-
         this.props.navigation.dispatch({
-            key: 'FirstPage',
+            key: 'Service',
             type: 'BcakToLatestScreenBeforeAndReload',
-            routeName: 'FirstPage',
+            routeName: 'Service',
             params: {
                 type: list.id
             }
         });
-        this.props.navigation.navigate('FirstPage', { type: list.id });
+        this.props.navigation.navigate('Service', { type: list.id });
 
     }
 
@@ -78,7 +74,6 @@ export default class Total extends Component {
     }
 
     render() {
-        const { navigate } = this.props.navigation;
         return (
             <View style={styles.container}>
                 <View style={{ height: 8, borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.08)' }}></View>
@@ -94,29 +89,7 @@ export default class Total extends Component {
 var styles = StyleSheet.create({
     container: {
         flex: 1,
-        height: height,
         backgroundColor: '#F1F1F2',
         flexDirection: 'column'
     },
-    headBlock: {
-        width: width,
-        height: 137,
-        backgroundColor: '#3F51B5'
-    },
-    userName: {
-        flex: 1,
-        height: height * 0.2,
-        paddingTop: 40,
-        paddingLeft: 20
-    },
-    userImage: {
-        width: 65,
-        height: 65,
-        alignSelf: 'center',
-        marginRight: 30
-    },
-    imageStyle: {
-        width: 65,
-        height: 65
-    }
 });

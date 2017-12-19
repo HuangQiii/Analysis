@@ -4,10 +4,8 @@ import List from '../components/List';
 import Button from '../components/Button';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const PRE_PRO = [
-    { name: '王玲玲', email: 'lingling.wang@hand-china.com', positional: '项目经理' },
-];
-export default class Member extends Component {
+const PRE_PRO = ['数据持久化'];
+export default class Services extends Component {
 
     static navigationOptions = ({ navigation }) => ({
         headerLeft: (
@@ -55,12 +53,14 @@ export default class Member extends Component {
     renderList(list) {
         return (
             <List
-                text={list.name + "  (" + list.email + ")"}
+                text={list}
                 bgColor={'rgba(255,255,255,0.87)'}
-                positional={list.positional}
-                listHeight={56}
                 borderBottom={true}
+                isSelected={true}
+                rightIconName={'ios-arrow-forward'}
+                iconColor={'rgba(0,0,0,0.54)'}
                 onPress={() => {
+                    this.props.navigation.navigate('Service')
                 }}
             />
         );

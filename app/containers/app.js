@@ -1,12 +1,13 @@
+import React, { Component } from 'react';
 import { StackNavigator, TabNavigator, NavigationActions } from 'react-navigation';
 import { Dimensions } from 'react-native';
-import FirstPage from '../pages/FirstPage';
-import Total from '../pages/Total';
+import Guide from '../pages/Guide';
+import Organization from '../pages/Organization';
 import Overview from '../pages/Overview';
+import Services from '../pages/Services';
 import Member from '../pages/Member';
 import Service from '../pages/Service';
-import Organization from '../pages/Organization';
-import Guide from '../pages/Guide';
+import Target from '../pages/Target';
 
 const { width, height } = Dimensions.get('window');
 const TabContainer = TabNavigator(
@@ -17,8 +18,8 @@ const TabContainer = TabNavigator(
                 tabBarLabel: '概览',
             },
         },
-        Service: {
-            screen: Service,
+        Services: {
+            screen: Services,
             navigationOptions: {
                 tabBarLabel: '服务',
             },
@@ -64,21 +65,21 @@ const TabContainer = TabNavigator(
 const App = StackNavigator(
     {
         Guide: {
-            screen: Guide
+            screen: Guide,
         },
         Home: {
             screen: TabContainer,
             navigationOptions: {
-                headerTitle: '开发项目'
+                headerTitle: '开发项目',
             }
         },
         Organization: {
             screen: Organization,
         },
-        FirstPage: {
-            screen: FirstPage,
+        Service: {
+            screen: Service,
         },
-        Total: { screen: Total }
+        Target: { screen: Target }
     },
     {
         headerMode: 'screen',
@@ -127,22 +128,8 @@ App.router.getStateForAction = (action, state) => {
             index: routes.length - 1,
         }
     }
-    if (state && action.type === 'BcakToLatestScreenAndReload') {
-        const routes = state.routes.slice(0, state.routes.length - 2);
-        // routes.splice(routes.length - 1, 1);
-        routes.push(action);
-        console.log(state.routes)
-        return {
-            ...state,
-            routes,
-            index: routes.length - 1,
-        };
-    }
     if (state && action.type === 'BcakToLatestScreenBeforeAndReload') {
         const routes = state.routes.slice(0, state.routes.length - 2);
-        // routes.splice(routes.length - 1, 1);
-        // routes.push(action);
-        console.log(state.routes)
         return {
             ...state,
             routes,
@@ -152,4 +139,23 @@ App.router.getStateForAction = (action, state) => {
     return prevGetStateForAction(action, state);
 };
 
-export default App;
+// export default App;
+
+class Routerr extends Component {
+    constructor(props, context) {
+        super(props, context);
+        console.log('app props: ', this.props);
+    }
+
+    _getProps() {
+        return {
+            proId: this.props.proId
+        }
+    }
+
+    render() {
+        return <App screenProps={this._getProps()} />;
+    }
+}
+
+export default Routerr;
