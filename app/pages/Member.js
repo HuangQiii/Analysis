@@ -7,6 +7,8 @@ import Icon from 'react-native-vector-icons/Ionicons';
 const PRE_PRO = [
     { name: '王玲玲', email: 'lingling.wang@hand-china.com', positional: '项目经理' },
 ];
+const url = 'http://gateway.devops.saas.hand-china.com/provide/v1/projectOverview/userList?projectId=144';
+const token = 'Bearer 31b64e20-12e5-4bb1-9272-21b92235d528';
 export default class Member extends Component {
 
     static navigationOptions = ({ navigation }) => ({
@@ -47,17 +49,25 @@ export default class Member extends Component {
     }
 
     getData() {
-        this.setState({
-            dataSource: this.state.dataSource.cloneWithRows(PRE_PRO)
+        fetch(url, {
+            headers: {
+                "Authorization": token
+            }
         })
+            .then((response) => response.json())
+            .then((responseData) => {
+                this.setState({
+                    dataSource: this.state.dataSource.cloneWithRows(responseData)
+                })
+            })
     }
 
     renderList(list) {
         return (
             <List
-                text={list.name + "  (" + list.email + ")"}
+                text={list.name + "  (" + list.user_email + ")"}
                 bgColor={'rgba(255,255,255,0.87)'}
-                positional={list.positional}
+                positional={list.member_name}
                 listHeight={56}
                 borderBottom={true}
                 onPress={() => {

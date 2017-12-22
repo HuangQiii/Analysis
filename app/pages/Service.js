@@ -7,6 +7,8 @@ import Line from '../components/Line';
 import PRETEND_CHART_DATA from '../constants/PretendData';
 import Icon from 'react-native-vector-icons/Ionicons';
 
+const url = 'http://gateway.devops.saas.hand-china.com/provide/v1/serviceOverview/serviceOverview?projectId=144&serviceId=';
+const token = 'Bearer 31b64e20-12e5-4bb1-9272-21b92235d528';
 const PRE_PRO = [
     { id: 0, name: '服务提交次数/失败次数', color: 'rgba(77,144,254,1)' },
     { id: 1, name: '服务构建次数/失败次数', color: 'rgba(27,193,35,1)' },
@@ -44,12 +46,33 @@ export default class FirstPage extends Component {
             server2: '',
             option: {},
             nowTime: '1小时',
+
+            submit: '',
+            build: '',
+            deploy: '',
+            release: '',
         };
     }
 
     componentDidMount() {
-        this.changeType()
+        this.changeType();
+        this.getData();
     }
+
+    getData() {
+        fetch(url + this.props.navigation.state.params.serviceId, {
+            headers: {
+                "Authorization": token
+            }
+        })
+            .then((response) => response.json())
+            .then((responseData) => {
+                this.setState({
+                    submit: responseData.pushNum,
+                    build: responseData.pipelineAllNum
+                })
+            })
+    };
 
     changeType(t) {
         if (this.props.navigation.state.params && this.props.navigation.state.params.type) {
@@ -101,10 +124,10 @@ export default class FirstPage extends Component {
                         <View style={styles.count}>
                             <View style={styles.countColumn}>
                                 <View style={{ flexDirection: 'row' }}>
-                                    <Text style={{ color: 'rgba(77,144,254,1)', }}>●  </Text><Text style={styles.fontNormal}>提交次数    53</Text>
+                                    <Text style={{ color: 'rgba(77,144,254,1)', }}>●  </Text><Text style={styles.fontNormal}>提交次数    {this.state.submit}</Text>
                                 </View>
                                 <View style={{ flexDirection: 'row' }}>
-                                    <Text style={{ color: 'rgba(27,193,35,1)' }}>●  </Text><Text style={styles.fontNormal}>构建次数    42</Text>
+                                    <Text style={{ color: 'rgba(27,193,35,1)' }}>●  </Text><Text style={styles.fontNormal}>构建次数    {this.state.build}</Text>
                                 </View>
                             </View>
                             <View style={styles.countColumn}>
@@ -208,7 +231,7 @@ export default class FirstPage extends Component {
                             value={this.state.server2.toString()}
                         />
                         <View style={{ flexDirection: 'row', height: 220, marginTop: -30, marginLeft: -12, }}>
-                            <Echarts option={this.state.option} height={250} width={width} onPress={(param) => { this.handlePressServer(param) }} />
+                            <Echarts option={this.state.option} height={250} width={width} appPath={this.props.screenProps.appPath} onPress={(param) => { this.handlePressServer(param) }} />
                         </View>
 
                     </View>

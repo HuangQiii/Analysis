@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
-import { Dimensions, ScrollView, View, Text, StyleSheet, NativeModules } from 'react-native';
+import { Dimensions, ScrollView, View, Text, StyleSheet, NativeModules, TouchableOpacity, DeviceEventEmitter } from 'react-native';
 import Label from '../components/Label';
 import Line from '../components/Line';
 import Echarts from 'native-echarts';
 import Icon from 'react-native-vector-icons/Ionicons';
 
+const url = 'http://gateway.devops.saas.hand-china.com/provide/v1/kanban/getBurndownChart?sprintId=';
+const url2 = 'http://gateway.devops.saas.hand-china.com/provide/v1/kanban/getCumulativeFlow?sprintId=';
+const token = 'Bearer 31b64e20-12e5-4bb1-9272-21b92235d528';
 const { width, height } = Dimensions.get('window');
 export default class Overview extends Component {
 
@@ -42,140 +45,159 @@ export default class Overview extends Component {
             burnDownOption: {},
             accumulativeFlowGraphOption: {},
 
-            burnDownChartTime: '',
             burnDownChartActual: '',
             burnDownChartIdeal: '',
 
-            accumulativeFlowGraphTime: '',
             accumulativeFlowGraph1: '',
             accumulativeFlowGraph2: '',
             accumulativeFlowGraph3: '',
             accumulativeFlowGraph4: '',
-            accumulativeFlowGraph5: '',
-            accumulativeFlowGraph6: '',
         };
     }
 
     componentDidMount() {
-        this.getData()
+        this.getData('')
+        DeviceEventEmitter.addListener('chooseBurnDown', (id) => {
+            this.getBurnDownData(id);
+        });
+        DeviceEventEmitter.addListener('chooseAccumulativeFlowGraph', (id) => {
+            this.getAccumulativeFlowGraphData(id);
+        });
     }
 
-    getData() {
-        this.setState({
-            burnDownOption: {
-                animation: true,
-                tooltip: {
-                    trigger: 'axis',
-                    showContent: true,
-                    formatter: function (params, ticket, callback) {
-                        // alert(params[0].name)
-                        window.postMessage(JSON.stringify(params));
-                    }
-                },
-                xAxis: [
-                    {
-                        //x轴点不是段
-                        boundaryGap: false,
-                        type: 'category',
-                        data: ['12/09', '12/10', '12/11', '12/12', '12/13', '12/14']
-                    }
-                ],
-                yAxis: [
-                    {
-                        type: 'value',
-                    }
-                ],
-                color: ['#F44336', 'rgba(0,0,0,0.26)'],
-                series: [
-                    {
-                        name: '实际值',
-                        type: 'line',
-                        data: [500, 360, 330, 220, 40, 0],
-                        smooth: true,
-                        // symbol: 'none'
-                    },
-                    {
-                        name: '期望值',
-                        type: 'line',
-                        data: [500, 400, 300, 200, 100, 0],
-                        // symbol: 'none'
-                    },
-                ]
-            },
-            accumulativeFlowGraphOption: {
-                animation: true,
-                tooltip: {
-                    trigger: 'axis',
-                    showContent: true,
-                    formatter: function (params, ticket, callback) {
-                        // alert(params[0].name)
-                        window.postMessage(JSON.stringify(params));
-                    }
-                },
-                xAxis: [
-                    {
-                        boundaryGap: false,
-                        data: ['12/1/5', '12/1/6', '12/1/7', '12/1/8', '12/1/9']
-                    }
-                ],
-                yAxis: [
-                    {
-                        type: 'value',
-                    }
-                ],
-                color: ['#F4B400', '#FF7043', '#4D90FE', '#F953BA', '#1BC123', '#743BE7'],
-                series: [
-                    {
-                        name: '完成',
-                        type: 'line',
-                        data: [0, 150, 190, 250, 160],
-                        smooth: true,
-                        // symbol: 'none'
-                    },
-                    {
-                        name: '测试',
-                        type: 'line',
-                        data: [100, 210, 250, 320, 230],
-                        smooth: true,
-                        // symbol: 'none'
-                    },
-                    {
-                        name: '开发',
-                        type: 'line',
-                        data: [120, 230, 270, 420, 250],
-                        smooth: true,
-                        // symbol: 'none'
-                    },
-                    {
-                        name: '待开发',
-                        type: 'line',
-                        data: [150, 250, 290, 460, 270],
-                        smooth: true,
-                        // symbol: 'none'
-                    },
-                    {
-                        name: '设计',
-                        type: 'line',
-                        data: [220, 300, 320, 520, 320],
-                        smooth: true,
-                        // symbol: 'none'
-                    },
-                    {
-                        name: '需求',
-                        type: 'line',
-                        data: [280, 320, 350, 620, 360],
-                        smooth: true,
-                        // symbol: 'none'
-                    }
-                ]
+    componentWillUnmount() {
+        DeviceEventEmitter.removeAllListeners('choose');
+    }
+
+    getData(id) {
+        this.getBurnDownData(id);
+        this.getAccumulativeFlowGraphData(id);
+    }
+
+    getBurnDownData(id) {
+        var ids = id === '' ? 2 : id;
+        fetch(url + ids, {
+            headers: {
+                "Authorization": token
             }
         })
+            .then((response) => response.json())
+            .then((responseData) => {
+                this.setState({
+                    burnDownOption: {
+                        animation: true,
+                        tooltip: {
+                            trigger: 'axis',
+                            showContent: true,
+                            formatter: function (params, ticket, callback) {
+                                // alert(params[0].name)
+                                window.postMessage(JSON.stringify(params));
+                            }
+                        },
+                        xAxis: [
+                            {
+                                //x轴点不是段
+                                boundaryGap: false,
+                                type: 'category',
+                                data: responseData["x-data"]
+                            }
+                        ],
+                        yAxis: [
+                            {
+                                type: 'value',
+                            }
+                        ],
+                        color: ['#F44336', 'rgba(0,0,0,0.26)'],
+                        series: [
+                            {
+                                name: '实际值',
+                                type: 'line',
+                                data: responseData["y-data"],
+                                smooth: true,
+                                // symbol: 'none'
+                            },
+                            {
+                                name: '期望值',
+                                type: 'line',
+                                data: responseData["y-total-data"]
+                                // symbol: 'none'
+                            },
+                        ]
+                    },
+                })
+            })
+    }
+
+    getAccumulativeFlowGraphData(id) {
+        var ids = id === '' ? 2 : id;
+        fetch(url2 + ids, {
+            headers: {
+                "Authorization": token
+            }
+        })
+            .then((response) => response.json())
+            .then((responseData) => {
+                this.setState({
+                    accumulativeFlowGraphOption: {
+                        animation: true,
+                        tooltip: {
+                            trigger: 'axis',
+                            showContent: true,
+                            formatter: function (params, ticket, callback) {
+                                // alert(params[0].name)
+                                window.postMessage(JSON.stringify(params));
+                            }
+                        },
+                        xAxis: [
+                            {
+                                boundaryGap: false,
+                                data: responseData["x-data"]
+                            }
+                        ],
+                        yAxis: [
+                            {
+                                type: 'value',
+                            }
+                        ],
+                        color: ['#F4B400', '#FF7043', '#4D90FE', '#F953BA', '#1BC123', '#743BE7'],
+                        series: [
+                            {
+                                name: '完成',
+                                type: 'line',
+                                data: responseData["y-data"][0],
+                                smooth: true,
+                                // symbol: 'none'
+                            },
+                            {
+                                name: '测试',
+                                type: 'line',
+                                data: responseData["y-data"][1],
+                                smooth: true,
+                                // symbol: 'none'
+                            },
+                            {
+                                name: '开发',
+                                type: 'line',
+                                data: responseData["y-data"][2],
+                                smooth: true,
+                                // symbol: 'none'
+                            },
+                            {
+                                name: '待开发',
+                                type: 'line',
+                                data: responseData["y-data"][3],
+                                smooth: true,
+                                // symbol: 'none'
+                            },
+                        ]
+                    }
+                })
+            })
     }
 
     handleBurnDownPress(param) {
         if (param instanceof Array) {
             this.setState({
-                burnDownChartTime: param[0].name,
                 burnDownChartActual: param[0].value,
                 burnDownChartIdeal: param[1].value,
             });
@@ -185,18 +207,16 @@ export default class Overview extends Component {
     handleAccumulativeFlowGraphPress(param) {
         if (param instanceof Array) {
             this.setState({
-                accumulativeFlowGraphTime: param[0].name,
                 accumulativeFlowGraph1: param[0].value,
                 accumulativeFlowGraph2: param[1].value,
                 accumulativeFlowGraph3: param[2].value,
                 accumulativeFlowGraph4: param[3].value,
-                accumulativeFlowGraph5: param[4].value,
-                accumulativeFlowGraph6: param[5].value,
             });
         }
     }
 
     render() {
+        const { navigate } = this.props.navigation;
         return (
             <ScrollView>
                 <View style={styles.container}>
@@ -236,15 +256,17 @@ export default class Overview extends Component {
                         </View>
                     </View>
                     <View style={styles.panel}>
-                        <View style={{ height: 38, }}>
+                        <View style={{}}>
                             <Text style={[styles.fontNormal, { marginTop: -4 }]}>燃尽图</Text>
                         </View>
                         <View>
-                            <Text style={[styles.fontNormal, { color: 'rgba(0,0,0,0.54)', marginTop: -4, }]}>冲刺： 2017/12/11 —— 2017/12/15   日常冲刺</Text>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
-                                <View style={{ paddingRight: 11, justifyContent: 'center' }}>
+                            <TouchableOpacity
+                                onPress={() => navigate('SelectBurnDown')}
+                            >
+                                <View style={{ height: 38, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <Text style={[styles.fontNormal, { color: 'rgba(0,0,0,0.54)', marginTop: -4 }]}>{'冲刺一'}</Text>
                                     <Icon
-                                        name="md-time"
+                                        name="ios-arrow-forward"
                                         color="rgba(0,0,0,0.9)"
                                         size={14}
                                         backgroundColor="transparent"
@@ -253,12 +275,10 @@ export default class Overview extends Component {
                                         onPress={() => {
                                         }}
                                     />
+
                                 </View>
-                                <View style={{ flex: 1 }}>
-                                    <Text style={styles.fontNormal}>时间</Text>
-                                </View>
-                                <Text>{this.state.burnDownChartTime}</Text>
-                            </View>
+                            </TouchableOpacity>
+
                             <Line
                                 text={'实际值'}
                                 color={'#F44336'}
@@ -269,21 +289,23 @@ export default class Overview extends Component {
                                 value={this.state.burnDownChartIdeal.toString()}
                             />
                             <View style={{ flexDirection: 'row', height: 220, marginTop: -30, marginLeft: -12, }}>
-                                <Echarts option={this.state.burnDownOption} height={250} width={width} onPress={(param) => { this.handleBurnDownPress(param) }} />
+                                <Echarts option={this.state.burnDownOption} height={250} width={width} appPath={this.props.screenProps.appPath} onPress={(param) => { this.handleBurnDownPress(param) }} />
                             </View>
 
                         </View>
                     </View>
                     <View style={styles.panel}>
-                        <View style={{ height: 38 }}>
+                        <View style={{}}>
                             <Text style={[styles.fontNormal, { marginTop: -4 }]}>累计流图</Text>
                         </View>
                         <View>
-                            <Text style={[styles.fontNormal, { color: 'rgba(0,0,0,0.54)', marginTop: -4 }]}>冲刺： 2017/12/11 —— 2017/12/15   日常冲刺</Text>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
-                                <View style={{ paddingRight: 11, justifyContent: 'center' }}>
+                            <TouchableOpacity
+                                onPress={() => navigate('SelectAccumulativeFlowGraph')}
+                            >
+                                <View style={{ height: 38, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <Text style={[styles.fontNormal, { color: 'rgba(0,0,0,0.54)', marginTop: -4 }]}>{'冲刺一'}</Text>
                                     <Icon
-                                        name="md-time"
+                                        name="ios-arrow-forward"
                                         color="rgba(0,0,0,0.9)"
                                         size={14}
                                         backgroundColor="transparent"
@@ -292,12 +314,10 @@ export default class Overview extends Component {
                                         onPress={() => {
                                         }}
                                     />
+
                                 </View>
-                                <View style={{ flex: 1 }}>
-                                    <Text style={styles.fontNormal}>时间</Text>
-                                </View>
-                                <Text>{this.state.accumulativeFlowGraphTime}</Text>
-                            </View>
+                            </TouchableOpacity>
+
                             <Line
                                 text={'完成'}
                                 value={this.state.accumulativeFlowGraph1.toString()}
@@ -318,18 +338,8 @@ export default class Overview extends Component {
                                 value={this.state.accumulativeFlowGraph4.toString()}
                                 color={'#F953BA'}
                             />
-                            <Line
-                                text={'设计'}
-                                value={this.state.accumulativeFlowGraph5.toString()}
-                                color={'#1BC123'}
-                            />
-                            <Line
-                                text={'需求'}
-                                value={this.state.accumulativeFlowGraph6.toString()}
-                                color={'#743BE7'}
-                            />
                             <View style={{ flexDirection: 'row', height: 220, marginTop: -30, marginLeft: -12, }}>
-                                <Echarts option={this.state.accumulativeFlowGraphOption} height={250} width={width} onPress={(param) => { this.handleAccumulativeFlowGraphPress(param) }} />
+                                <Echarts option={this.state.accumulativeFlowGraphOption} height={250} width={width} appPath={this.props.screenProps.appPath} onPress={(param) => { this.handleAccumulativeFlowGraphPress(param) }} />
                             </View>
 
                         </View>

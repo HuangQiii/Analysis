@@ -288,7 +288,7 @@ export default class FirstPage extends Component {
                                 value={this.state.member2.toString()}
                             />
                             <View style={{ flexDirection: 'row', height: 220, marginTop: -30, marginLeft: -12, }}>
-                                <Echarts option={this.state.chart1} height={250} width={width} onPress={(param) => { this.handlePressMember(param) }} />
+                                <Echarts option={this.state.chart1} height={250} width={width} appPath={this.props.screenProps.appPath} onPress={(param) => { this.handlePressMember(param) }} />
                             </View>
                         </View>
                     </View>
@@ -355,7 +355,7 @@ export default class FirstPage extends Component {
                                 value={this.state.number}
                             />
                             <View style={{ flexDirection: 'row', height: 220, marginTop: -30, marginLeft: -12, }}>
-                                <Echarts option={this.state.chart} height={250} width={width} onPress={(param) => { this.handlePressNumber(param) }} />
+                                <Echarts option={this.state.chart} height={250} width={width} appPath={this.props.screenProps.appPath} onPress={(param) => { this.handlePressNumber(param) }} />
                             </View>
 
                         </View>

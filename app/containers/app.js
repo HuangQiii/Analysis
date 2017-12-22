@@ -8,6 +8,8 @@ import Services from '../pages/Services';
 import Member from '../pages/Member';
 import Service from '../pages/Service';
 import Target from '../pages/Target';
+import SelectBurnDown from '../pages/SelectBurnDown';
+import SelectAccumulativeFlowGraph from '../pages/SelectAccumulativeFlowGraph';
 
 const { width, height } = Dimensions.get('window');
 const TabContainer = TabNavigator(
@@ -79,7 +81,9 @@ const App = StackNavigator(
         Service: {
             screen: Service,
         },
-        Target: { screen: Target }
+        Target: { screen: Target },
+        SelectBurnDown: { screen: SelectBurnDown },
+        SelectAccumulativeFlowGraph: { screen: SelectAccumulativeFlowGraph },
     },
     {
         headerMode: 'screen',
@@ -119,6 +123,7 @@ App.router.getStateForAction = (action, state) => {
             return -1;
         }
         var i = findDateInArr(state.routes, 'routeName', action.routeName);
+        console.log(i);
         if (i != -1) {
             var routes = state.routes.slice(0, i + 1);
         }
@@ -150,7 +155,8 @@ class Router extends Component {
     getProps() {
         return {
             proId: this.props.proId,
-            orgId: this.props.orgId
+            orgId: this.props.orgId,
+            appPath: this.props.appPath,
         }
     }
 

@@ -1,27 +1,19 @@
-import React, { Component } from 'react';
-import { View, StyleSheet, ListView, NativeModules } from 'react-native';
+import React, { Component, } from 'react';
+import { View, StyleSheet, ListView, NativeModules, DeviceEventEmitter } from 'react-native';
 import List from '../components/List';
 import Button from '../components/Button';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const PRE_PRO = ['数据持久化'];
-const url = 'http://gateway.devops.saas.hand-china.com/provide/v1/projectOverview/serviceList?projectId=144';
-const token = 'Bearer 31b64e20-12e5-4bb1-9272-21b92235d528';
-export default class Services extends Component {
+const PRE_PRO = [
+    { id: 0, name: '1' },
+    { id: 1, name: '2' },
+    { id: 2, name: '3' },
+    { id: 3, name: '4' },
+];
+export default class SelectAccumulativeFlowGraph extends Component {
 
     static navigationOptions = ({ navigation }) => ({
-        headerLeft: (
-            <Icon.Button
-                name="md-menu"
-                size={28}
-                backgroundColor="transparent"
-                underlayColor="transparent"
-                activeOpacity={1}
-                onPress={() => {
-                    NativeModules.NativeManager.openDrawer()
-                }}
-            />
-        ),
+        title: `累计流图：选择冲刺`,
         headerRight: (
             <Icon.Button
                 name="md-checkmark"
@@ -47,30 +39,30 @@ export default class Services extends Component {
     }
 
     getData() {
-        fetch(url, {
-            headers: {
-                "Authorization": token
-            }
+        this.setState({
+            dataSource: this.state.dataSource.cloneWithRows(PRE_PRO)
         })
-            .then((response) => response.json())
-            .then((responseData) => {
-                this.setState({
-                    dataSource: this.state.dataSource.cloneWithRows(responseData)
-                })
-            })
+    }
+
+    select(list) {
+        DeviceEventEmitter.emit('chooseAccumulativeFlowGraph', 4);
+        this.props.navigation.dispatch({
+            key: 'Home',
+            type: 'BcakToCurrentScreen',
+            routeName: 'Home',
+        });
     }
 
     renderList(list) {
         return (
             <List
-                text={list.serviceName}
+                text={list.name}
                 bgColor={'rgba(255,255,255,0.87)'}
                 borderBottom={true}
-                isSelected={true}
-                rightIconName={'ios-arrow-forward'}
-                iconColor={'rgba(0,0,0,0.54)'}
+                rightIconName={'md-checkmark'}
+                iconColor={'#3F51B5'}
                 onPress={() => {
-                    this.props.navigation.navigate('Service', { serviceId: list.id })
+                    this.select(list)
                 }}
             />
         );
