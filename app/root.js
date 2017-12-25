@@ -11,7 +11,8 @@ class Root extends Component {
         return (
             <Router
                 orgId={this.props.orgId}
-                proId={this.props.proId}
+                //proId={this.props.proId}
+                proId={185}
                 appPath={this.props.appPath}
             />
         );

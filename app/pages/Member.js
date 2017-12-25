@@ -4,11 +4,8 @@ import List from '../components/List';
 import Button from '../components/Button';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const PRE_PRO = [
-    { name: '王玲玲', email: 'lingling.wang@hand-china.com', positional: '项目经理' },
-];
-const url = 'http://gateway.devops.saas.hand-china.com/provide/v1/projectOverview/userList?projectId=144';
-const token = 'Bearer 31b64e20-12e5-4bb1-9272-21b92235d528';
+let url = 'http://gateway.devops.saas.hand-china.com';
+let token = 'Bearer 877dcc6b-bddf-4405-a5d7-04e8a4a7c534';
 export default class Member extends Component {
 
     static navigationOptions = ({ navigation }) => ({
@@ -49,7 +46,7 @@ export default class Member extends Component {
     }
 
     getData() {
-        fetch(url, {
+        fetch(url + '/provide/v1/projectOverview/userList?projectId=' + this.props.screenProps.proId, {
             headers: {
                 "Authorization": token
             }

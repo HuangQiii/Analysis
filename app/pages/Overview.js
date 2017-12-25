@@ -5,9 +5,9 @@ import Line from '../components/Line';
 import Echarts from 'native-echarts';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const url = 'http://gateway.devops.saas.hand-china.com/provide/v1/kanban/getBurndownChart?sprintId=';
-const url2 = 'http://gateway.devops.saas.hand-china.com/provide/v1/kanban/getCumulativeFlow?sprintId=';
-const token = 'Bearer 31b64e20-12e5-4bb1-9272-21b92235d528';
+let url = 'http://gateway.devops.saas.hand-china.com';
+let token = 'Bearer 877dcc6b-bddf-4405-a5d7-04e8a4a7c534';
+
 const { width, height } = Dimensions.get('window');
 export default class Overview extends Component {
 
@@ -42,12 +42,19 @@ export default class Overview extends Component {
         console.log('overview props: ', this.props.screenProps);
 
         this.state = {
+            getPlanDoneProgress: 0,
+            getChangeAverageTime: 0,
+            getBugAverageTime: 0,
+            getChangeDoneProgress: 0,
+
             burnDownOption: {},
             accumulativeFlowGraphOption: {},
 
+            burnDownChartSprint: {},
             burnDownChartActual: '',
             burnDownChartIdeal: '',
 
+            accumulativeFlowGraphSprint: {},
             accumulativeFlowGraph1: '',
             accumulativeFlowGraph2: '',
             accumulativeFlowGraph3: '',
@@ -55,13 +62,32 @@ export default class Overview extends Component {
         };
     }
 
+    componentWillMount() {
+        if (this.props.screenProps.proId === '') {
+            // if (true) {
+            this.props.navigation.dispatch({
+                key: 'Organization',
+                type: 'ReplaceCurrentScreen',
+                routeName: 'Organization',
+                params: {
+                }
+            });
+        }
+    }
+
     componentDidMount() {
         this.getData('')
-        DeviceEventEmitter.addListener('chooseBurnDown', (id) => {
-            this.getBurnDownData(id);
+        DeviceEventEmitter.addListener('chooseBurnDown', (list) => {
+            this.getBurnDownData(list.id);
+            this.setState({
+                burnDownChartSprint: list
+            });
         });
-        DeviceEventEmitter.addListener('chooseAccumulativeFlowGraph', (id) => {
-            this.getAccumulativeFlowGraphData(id);
+        DeviceEventEmitter.addListener('chooseAccumulativeFlowGraph', (list) => {
+            this.getAccumulativeFlowGraphData(list.id);
+            this.setState({
+                accumulativeFlowGraphSprint: list
+            });
         });
     }
 
@@ -70,13 +96,13 @@ export default class Overview extends Component {
     }
 
     getData(id) {
+        this.getMessage(id);
         this.getBurnDownData(id);
         this.getAccumulativeFlowGraphData(id);
     }
 
-    getBurnDownData(id) {
-        var ids = id === '' ? 2 : id;
-        fetch(url + ids, {
+    getMessage(id) {
+        fetch(url + '/provide/v1/projectOverview/projectPlanOverview?projectId=' + this.props.screenProps.proId, {
             headers: {
                 "Authorization": token
             }
@@ -84,115 +110,272 @@ export default class Overview extends Component {
             .then((response) => response.json())
             .then((responseData) => {
                 this.setState({
-                    burnDownOption: {
-                        animation: true,
-                        tooltip: {
-                            trigger: 'axis',
-                            showContent: true,
-                            formatter: function (params, ticket, callback) {
-                                // alert(params[0].name)
-                                window.postMessage(JSON.stringify(params));
-                            }
-                        },
-                        xAxis: [
-                            {
-                                //x轴点不是段
-                                boundaryGap: false,
-                                type: 'category',
-                                data: responseData["x-data"]
-                            }
-                        ],
-                        yAxis: [
-                            {
-                                type: 'value',
-                            }
-                        ],
-                        color: ['#F44336', 'rgba(0,0,0,0.26)'],
-                        series: [
-                            {
-                                name: '实际值',
-                                type: 'line',
-                                data: responseData["y-data"],
-                                smooth: true,
-                                // symbol: 'none'
-                            },
-                            {
-                                name: '期望值',
-                                type: 'line',
-                                data: responseData["y-total-data"]
-                                // symbol: 'none'
-                            },
-                        ]
-                    },
+                    getPlanDoneProgress: responseData.getPlanDoneProgress,
+                    getChangeAverageTime: responseData.getChangeAverageTime,
+                    getBugAverageTime: responseData.getBugAverageTime,
+                    getChangeDoneProgress: responseData.getChangeDoneProgress
                 })
             })
     }
 
-    getAccumulativeFlowGraphData(id) {
-        var ids = id === '' ? 2 : id;
-        fetch(url2 + ids, {
-            headers: {
-                "Authorization": token
-            }
-        })
-            .then((response) => response.json())
-            .then((responseData) => {
-                this.setState({
-                    accumulativeFlowGraphOption: {
-                        animation: true,
-                        tooltip: {
-                            trigger: 'axis',
-                            showContent: true,
-                            formatter: function (params, ticket, callback) {
-                                // alert(params[0].name)
-                                window.postMessage(JSON.stringify(params));
-                            }
-                        },
-                        xAxis: [
-                            {
-                                boundaryGap: false,
-                                data: responseData["x-data"]
-                            }
-                        ],
-                        yAxis: [
-                            {
-                                type: 'value',
-                            }
-                        ],
-                        color: ['#F4B400', '#FF7043', '#4D90FE', '#F953BA', '#1BC123', '#743BE7'],
-                        series: [
-                            {
-                                name: '完成',
-                                type: 'line',
-                                data: responseData["y-data"][0],
-                                smooth: true,
-                                // symbol: 'none'
-                            },
-                            {
-                                name: '测试',
-                                type: 'line',
-                                data: responseData["y-data"][1],
-                                smooth: true,
-                                // symbol: 'none'
-                            },
-                            {
-                                name: '开发',
-                                type: 'line',
-                                data: responseData["y-data"][2],
-                                smooth: true,
-                                // symbol: 'none'
-                            },
-                            {
-                                name: '待开发',
-                                type: 'line',
-                                data: responseData["y-data"][3],
-                                smooth: true,
-                                // symbol: 'none'
-                            },
-                        ]
-                    }
-                })
+    getBurnDownData(id) {
+        if (id === '') {
+            fetch(url + '/provide/v1/kanban/getCuttentSprints?projectId=' + this.props.screenProps.proId, {
+                headers: {
+                    "Authorization": token
+                }
             })
+                .then((response) => response.json())
+                .then((responseData) => {
+                    this.setState({
+                        burnDownChartSprint: responseData[0]
+                    })
+                    fetch(url + '/provide/v1/kanban/getBurndownChart?sprintId=' + responseData[0].id, {
+                        headers: {
+                            "Authorization": token
+                        }
+                    })
+                        .then((response) => response.json())
+                        .then((responseData) => {
+                            this.setState({
+                                burnDownOption: {
+                                    animation: true,
+                                    tooltip: {
+                                        trigger: 'axis',
+                                        showContent: true,
+                                        formatter: function (params, ticket, callback) {
+                                            // alert(params[0].name)
+                                            window.postMessage(JSON.stringify(params));
+                                        }
+                                    },
+                                    xAxis: [
+                                        {
+                                            //x轴点不是段
+                                            boundaryGap: false,
+                                            type: 'category',
+                                            data: responseData["x-data"]
+                                        }
+                                    ],
+                                    yAxis: [
+                                        {
+                                            type: 'value',
+                                        }
+                                    ],
+                                    color: ['#F44336', 'rgba(0,0,0,0.26)'],
+                                    series: [
+                                        {
+                                            name: '实际值',
+                                            type: 'line',
+                                            data: responseData["y-data"],
+                                            smooth: true,
+                                            // symbol: 'none'
+                                        },
+                                        {
+                                            name: '期望值',
+                                            type: 'line',
+                                            data: responseData["y-total-data"]
+                                            // symbol: 'none'
+                                        },
+                                    ]
+                                },
+                            })
+                        })
+                })
+        } else {
+            fetch(url + '/provide/v1/kanban/getBurndownChart?sprintId=' + id, {
+                headers: {
+                    "Authorization": token
+                }
+            })
+                .then((response) => response.json())
+                .then((responseData) => {
+                    this.setState({
+                        burnDownOption: {
+                            animation: true,
+                            tooltip: {
+                                trigger: 'axis',
+                                showContent: true,
+                                formatter: function (params, ticket, callback) {
+                                    // alert(params[0].name)
+                                    window.postMessage(JSON.stringify(params));
+                                }
+                            },
+                            xAxis: [
+                                {
+                                    //x轴点不是段
+                                    boundaryGap: false,
+                                    type: 'category',
+                                    data: responseData["x-data"]
+                                }
+                            ],
+                            yAxis: [
+                                {
+                                    type: 'value',
+                                }
+                            ],
+                            color: ['#F44336', 'rgba(0,0,0,0.26)'],
+                            series: [
+                                {
+                                    name: '实际值',
+                                    type: 'line',
+                                    data: responseData["y-data"],
+                                    smooth: true,
+                                    // symbol: 'none'
+                                },
+                                {
+                                    name: '期望值',
+                                    type: 'line',
+                                    data: responseData["y-total-data"]
+                                    // symbol: 'none'
+                                },
+                            ]
+                        },
+                    })
+                })
+        }
+    }
+
+    getAccumulativeFlowGraphData(id) {
+        if (id === '') {
+            fetch(url + '/provide/v1/kanban/getCuttentSprints?projectId=' + this.props.screenProps.proId, {
+                headers: {
+                    "Authorization": token
+                }
+            })
+                .then((response) => response.json())
+                .then((responseData) => {
+                    this.setState({
+                        accumulativeFlowGraphSprint: responseData[0]
+                    })
+                    fetch(url + '/provide/v1/kanban/getCumulativeFlow?sprintId=' + responseData[0].id, {
+                        headers: {
+                            "Authorization": token
+                        }
+                    })
+                        .then((response) => response.json())
+                        .then((responseData) => {
+                            this.setState({
+                                accumulativeFlowGraphOption: {
+                                    animation: true,
+                                    tooltip: {
+                                        trigger: 'axis',
+                                        showContent: true,
+                                        formatter: function (params, ticket, callback) {
+                                            // alert(params[0].name)
+                                            window.postMessage(JSON.stringify(params));
+                                        }
+                                    },
+                                    xAxis: [
+                                        {
+                                            boundaryGap: false,
+                                            data: responseData["x-data"]
+                                        }
+                                    ],
+                                    yAxis: [
+                                        {
+                                            type: 'value',
+                                        }
+                                    ],
+                                    color: ['#F4B400', '#FF7043', '#4D90FE', '#F953BA', '#1BC123', '#743BE7'],
+                                    series: [
+                                        {
+                                            name: '完成',
+                                            type: 'line',
+                                            data: responseData["y-data"][0],
+                                            smooth: true,
+                                            // symbol: 'none'
+                                        },
+                                        {
+                                            name: '测试',
+                                            type: 'line',
+                                            data: responseData["y-data"][1],
+                                            smooth: true,
+                                            // symbol: 'none'
+                                        },
+                                        {
+                                            name: '开发',
+                                            type: 'line',
+                                            data: responseData["y-data"][2],
+                                            smooth: true,
+                                            // symbol: 'none'
+                                        },
+                                        {
+                                            name: '待开发',
+                                            type: 'line',
+                                            data: responseData["y-data"][3],
+                                            smooth: true,
+                                            // symbol: 'none'
+                                        },
+                                    ]
+                                }
+                            })
+                        })
+                })
+        } else {
+            fetch(url + '/provide/v1/kanban/getCumulativeFlow?sprintId=' + id, {
+                headers: {
+                    "Authorization": token
+                }
+            })
+                .then((response) => response.json())
+                .then((responseData) => {
+                    this.setState({
+                        accumulativeFlowGraphOption: {
+                            animation: true,
+                            tooltip: {
+                                trigger: 'axis',
+                                showContent: true,
+                                formatter: function (params, ticket, callback) {
+                                    // alert(params[0].name)
+                                    window.postMessage(JSON.stringify(params));
+                                }
+                            },
+                            xAxis: [
+                                {
+                                    boundaryGap: false,
+                                    data: responseData["x-data"]
+                                }
+                            ],
+                            yAxis: [
+                                {
+                                    type: 'value',
+                                }
+                            ],
+                            color: ['#F4B400', '#FF7043', '#4D90FE', '#F953BA', '#1BC123', '#743BE7'],
+                            series: [
+                                {
+                                    name: '完成',
+                                    type: 'line',
+                                    data: responseData["y-data"][0],
+                                    smooth: true,
+                                    // symbol: 'none'
+                                },
+                                {
+                                    name: '测试',
+                                    type: 'line',
+                                    data: responseData["y-data"][1],
+                                    smooth: true,
+                                    // symbol: 'none'
+                                },
+                                {
+                                    name: '开发',
+                                    type: 'line',
+                                    data: responseData["y-data"][2],
+                                    smooth: true,
+                                    // symbol: 'none'
+                                },
+                                {
+                                    name: '待开发',
+                                    type: 'line',
+                                    data: responseData["y-data"][3],
+                                    smooth: true,
+                                    // symbol: 'none'
+                                },
+                            ]
+                        }
+                    })
+                })
+        }
     }
 
     handleBurnDownPress(param) {
@@ -228,26 +411,26 @@ export default class Overview extends Component {
                             <View style={styles.count}>
                                 <View style={styles.countColumn}>
                                     <Label
-                                        text={'部署频率'}
-                                        number={29}
-                                        unit={'/天'}
+                                        text={'计划完成率'}
+                                        number={this.state.getPlanDoneProgress.toFixed(2) * 100}
+                                        unit={'%'}
                                     />
                                     <Label
-                                        text={'变更时长'}
-                                        number={29}
+                                        text={'变更完成率'}
+                                        number={this.state.getChangeDoneProgress.toFixed(2) * 100}
                                         marginTop={10}
-                                        unit={'/小时'}
+                                        unit={'%'}
                                     />
                                 </View>
                                 <View style={styles.countColumn}>
                                     <Label
-                                        text={'变更完成率'}
-                                        number={29}
-                                        unit={'%'}
+                                        text={'变更时长'}
+                                        number={this.state.getChangeAverageTime.toFixed(2)}
+                                        unit={'/小时'}
                                     />
                                     <Label
                                         text={'问题平均处理时长'}
-                                        number={8}
+                                        number={this.state.getBugAverageTime.toFixed(2)}
                                         marginTop={10}
                                         unit={'小时'}
                                     />
@@ -264,7 +447,7 @@ export default class Overview extends Component {
                                 onPress={() => navigate('SelectBurnDown')}
                             >
                                 <View style={{ height: 38, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <Text style={[styles.fontNormal, { color: 'rgba(0,0,0,0.54)', marginTop: -4 }]}>{'冲刺一'}</Text>
+                                    <Text style={[styles.fontNormal, { color: 'rgba(0,0,0,0.54)', marginTop: -4 }]}>{this.state.burnDownChartSprint.name}</Text>
                                     <Icon
                                         name="ios-arrow-forward"
                                         color="rgba(0,0,0,0.9)"
@@ -303,7 +486,7 @@ export default class Overview extends Component {
                                 onPress={() => navigate('SelectAccumulativeFlowGraph')}
                             >
                                 <View style={{ height: 38, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <Text style={[styles.fontNormal, { color: 'rgba(0,0,0,0.54)', marginTop: -4 }]}>{'冲刺一'}</Text>
+                                    <Text style={[styles.fontNormal, { color: 'rgba(0,0,0,0.54)', marginTop: -4 }]}>{this.state.accumulativeFlowGraphSprint.name}</Text>
                                     <Icon
                                         name="ios-arrow-forward"
                                         color="rgba(0,0,0,0.9)"
@@ -324,17 +507,17 @@ export default class Overview extends Component {
                                 color={'#F4B400'}
                             />
                             <Line
-                                text={'测试'}
+                                text={'开发'}
                                 value={this.state.accumulativeFlowGraph2.toString()}
                                 color={'#FF7043'}
                             />
                             <Line
-                                text={'开发'}
+                                text={'待开发'}
                                 value={this.state.accumulativeFlowGraph3.toString()}
                                 color={'#4D90FE'}
                             />
                             <Line
-                                text={'待开发'}
+                                text={'需求'}
                                 value={this.state.accumulativeFlowGraph4.toString()}
                                 color={'#F953BA'}
                             />

@@ -1,5 +1,5 @@
 import React, { Component, } from 'react';
-import { View, StyleSheet, ListView, NativeModules } from 'react-native';
+import { View, StyleSheet, ListView, NativeModules, DeviceEventEmitter } from 'react-native';
 import List from '../components/List';
 import Button from '../components/Button';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -7,8 +7,6 @@ import Icon from 'react-native-vector-icons/Ionicons';
 const PRE_PRO = [
     { id: 0, name: '服务提交次数/失败次数' },
     { id: 1, name: '服务构建次数/失败次数' },
-    { id: 2, name: '服务部署次数/失败次数' },
-    { id: 3, name: '服务发布次数/失败次数' },
 ];
 export default class Target extends Component {
 
@@ -45,15 +43,12 @@ export default class Target extends Component {
     }
 
     select(list) {
+        DeviceEventEmitter.emit('chooseType', list.id);
         this.props.navigation.dispatch({
             key: 'Service',
-            type: 'BcakToLatestScreenBeforeAndReload',
+            type: 'BcakToCurrentScreen',
             routeName: 'Service',
-            params: {
-                type: list.id
-            }
         });
-        this.props.navigation.navigate('Service', { type: list.id });
 
     }
 

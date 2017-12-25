@@ -4,12 +4,9 @@ import List from '../components/List';
 import Button from '../components/Button';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const PRE_PRO = [
-    { id: 0, name: '1' },
-    { id: 1, name: '2' },
-    { id: 2, name: '3' },
-    { id: 3, name: '4' },
-];
+let url = 'http://gateway.devops.saas.hand-china.com';
+let token = 'Bearer 877dcc6b-bddf-4405-a5d7-04e8a4a7c534';
+
 export default class SelectAccumulativeFlowGraph extends Component {
 
     static navigationOptions = ({ navigation }) => ({
@@ -39,13 +36,21 @@ export default class SelectAccumulativeFlowGraph extends Component {
     }
 
     getData() {
-        this.setState({
-            dataSource: this.state.dataSource.cloneWithRows(PRE_PRO)
+        fetch(url + '/provide/v1/kanban/getCuttentSprints?projectId=' + this.props.screenProps.proId, {
+            headers: {
+                "Authorization": token
+            }
         })
+            .then((response) => response.json())
+            .then((responseData) => {
+                this.setState({
+                    dataSource: this.state.dataSource.cloneWithRows(responseData)
+                })
+            })
     }
 
     select(list) {
-        DeviceEventEmitter.emit('chooseAccumulativeFlowGraph', 4);
+        DeviceEventEmitter.emit('chooseAccumulativeFlowGraph', list);
         this.props.navigation.dispatch({
             key: 'Home',
             type: 'BcakToCurrentScreen',

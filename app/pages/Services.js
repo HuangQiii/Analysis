@@ -4,9 +4,9 @@ import List from '../components/List';
 import Button from '../components/Button';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const PRE_PRO = ['数据持久化'];
-const url = 'http://gateway.devops.saas.hand-china.com/provide/v1/projectOverview/serviceList?projectId=144';
-const token = 'Bearer 31b64e20-12e5-4bb1-9272-21b92235d528';
+let url = 'http://gateway.devops.saas.hand-china.com';
+let token = 'Bearer 877dcc6b-bddf-4405-a5d7-04e8a4a7c534';
+
 export default class Services extends Component {
 
     static navigationOptions = ({ navigation }) => ({
@@ -47,7 +47,7 @@ export default class Services extends Component {
     }
 
     getData() {
-        fetch(url, {
+        fetch(url + '/provide/v1/projectOverview/serviceList?projectId=' + this.props.screenProps.proId, {
             headers: {
                 "Authorization": token
             }
@@ -70,7 +70,7 @@ export default class Services extends Component {
                 rightIconName={'ios-arrow-forward'}
                 iconColor={'rgba(0,0,0,0.54)'}
                 onPress={() => {
-                    this.props.navigation.navigate('Service', { serviceId: list.id })
+                    this.props.navigation.navigate('Service', { service: list })
                 }}
             />
         );

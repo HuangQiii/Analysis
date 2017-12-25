@@ -1,5 +1,5 @@
 import React, { Component, } from 'react';
-import { View, Dimensions, StyleSheet, Text, TouchableOpacity, NativeModules } from 'react-native';
+import { View, Dimensions, StyleSheet, Text, TouchableOpacity, NativeModules, DeviceEventEmitter } from 'react-native';
 import List from '../components/List';
 import Echarts from 'native-echarts';
 import Tab from '../components/Tab';
@@ -7,21 +7,23 @@ import Line from '../components/Line';
 import PRETEND_CHART_DATA from '../constants/PretendData';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const url = 'http://gateway.devops.saas.hand-china.com/provide/v1/serviceOverview/serviceOverview?projectId=144&serviceId=';
-const token = 'Bearer 31b64e20-12e5-4bb1-9272-21b92235d528';
+let url = 'http://gateway.devops.saas.hand-china.com';
+let token = 'Bearer 877dcc6b-bddf-4405-a5d7-04e8a4a7c534';
+
 const PRE_PRO = [
     { id: 0, name: '服务提交次数/失败次数', color: 'rgba(77,144,254,1)' },
     { id: 1, name: '服务构建次数/失败次数', color: 'rgba(27,193,35,1)' },
-    { id: 2, name: '服务部署次数/失败次数', color: 'rgba(255,153,21,1)' },
-    { id: 3, name: '服务发布次数/失败次数', color: 'rgba(249,83,186,1)' },
+    // { id: 2, name: '服务部署次数/失败次数', color: 'rgba(255,153,21,1)' },
+    // { id: 3, name: '服务发布次数/失败次数', color: 'rgba(249,83,186,1)' },
 ];
 const COLOR = ['rgba(77,144,254,1)', 'rgba(27,193,35,1)', 'rgba(255,153,21,1)', 'rgba(249,83,186,1)'];
-const ARRAY_DATE = ['1小时', '6小时', '1天', '7天', '30天'];
+const ARRAY_DATE = ['1小时', '6小时', '一天', '七天'];
+
 const { width, height } = Dimensions.get('window');
 export default class FirstPage extends Component {
 
     static navigationOptions = ({ navigation }) => ({
-        title: `数据持续化服务`,
+        title: navigation.state.params.service.serviceName,
 
         headerRight: (
             <Icon.Button
@@ -55,12 +57,18 @@ export default class FirstPage extends Component {
     }
 
     componentDidMount() {
+        DeviceEventEmitter.addListener('chooseType', (type) => {
+            this.setState({
+                type: type,
+            });
+            this.changeType(type);
+        });
         this.changeType();
         this.getData();
     }
 
     getData() {
-        fetch(url + this.props.navigation.state.params.serviceId, {
+        fetch(url + '/provide/v1/serviceOverview/serviceOverview?projectId=' + this.props.screenProps.proId + '&serviceId=' + this.props.navigation.state.params.service.id, {
             headers: {
                 "Authorization": token
             }
@@ -74,18 +82,17 @@ export default class FirstPage extends Component {
             })
     };
 
-    changeType(t) {
-        if (this.props.navigation.state.params && this.props.navigation.state.params.type) {
-            this.setState({
-                type: this.props.navigation.state.params.type,
-                option: PRETEND_CHART_DATA[this.props.navigation.state.params.type][0]
-            })
-        } else {
+    changeType(type) {
+        // (this.props.navigation.state.params && this.props.navigation.state.params.type) 
+        if (type === undefined) {
             this.setState({
                 option: PRETEND_CHART_DATA[this.state.type][0]
             });
+        } else {
+            this.setState({
+                option: PRETEND_CHART_DATA[type][0]
+            })
         }
-
     }
 
     changeTime(param) {
@@ -175,30 +182,13 @@ export default class FirstPage extends Component {
                             />
                             <Tab
                                 text={'1天'}
-                                onPress={() => this.changeTime('1天')}
-                                active={this.state.nowTime === '1天'}
+                                onPress={() => this.changeTime('一天')}
+                                active={this.state.nowTime === '一天'}
                             />
                             <Tab
                                 text={'7天'}
-                                onPress={() => this.changeTime('7天')}
-                                active={this.state.nowTime === '7天'}
-                            />
-                            <Tab
-                                text={'30天'}
-                                onPress={() => this.changeTime('30天')}
-                                active={this.state.nowTime === '30天'}
-                            />
-                        </View>
-                        <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', }}>
-                            <Icon
-                                name="md-calendar"
-                                color="rgba(0,0,0,0.9)"
-                                size={26}
-                                backgroundColor="transparent"
-                                underlayColor="transparent"
-                                activeOpacity={1}
-                                onPress={() => {
-                                }}
+                                onPress={() => this.changeTime('七天')}
+                                active={this.state.nowTime === '七天'}
                             />
                         </View>
                     </View>
@@ -217,7 +207,7 @@ export default class FirstPage extends Component {
                                 />
                             </View>
                             <View style={{ flex: 1 }}>
-                                <Text style={styles.fontNormal}>时间</Text>
+                                <Text style={styles.fontNormal}>数据采集时间</Text>
                             </View>
                             <Text>{this.state.serverTime}</Text>
                         </View>

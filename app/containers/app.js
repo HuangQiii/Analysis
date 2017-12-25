@@ -12,6 +12,7 @@ import SelectBurnDown from '../pages/SelectBurnDown';
 import SelectAccumulativeFlowGraph from '../pages/SelectAccumulativeFlowGraph';
 
 const { width, height } = Dimensions.get('window');
+
 const TabContainer = TabNavigator(
     {
         Overview: {
@@ -66,9 +67,12 @@ const TabContainer = TabNavigator(
 
 const App = StackNavigator(
     {
-        Guide: {
-            screen: Guide,
-        },
+        // Guide: {
+        //     screen: Guide,
+        //     navigationOptions: {
+        //         headerMode: 'none'
+        //     }
+        // },
         Home: {
             screen: TabContainer,
             navigationOptions: {
@@ -111,6 +115,15 @@ App.router.getStateForAction = (action, state) => {
             ...state,
             routes,
             index: routes.length - 1,
+        };
+    }
+    if (state && action.type === 'ReplaceCurrentScreenToTab') {
+        const routes = state.routes.slice(0, state.routes.length - 1);
+        routes.push(action);
+        return {
+            ...state,
+            routes,
+            index: 0,
         };
     }
     if (state && action.type === 'BcakToCurrentScreen') {
