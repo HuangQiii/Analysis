@@ -1,25 +1,26 @@
 {
-  "name": "AnalysisAndroid",
-  "version": "0.0.1",
-  "private": true,
-  "scripts": {
-    "start": "node node_modules/react-native/local-cli/cli.js start",
-    "test": "jest",
-    "bundle-output": "node node_modules/react-native/local-cli/cli.js bundle --platform android --dev false --entry-file index.android.js --bundle-output output/index.android.bundle --assets-dest output"
-  },
-  "dependencies": {
-    "native-echarts": "^0.4.0",
-    "react": "16.0.0-alpha.12",
-    "react-native": "0.46.1",
-    "react-native-chart": "^1.0.8-beta"
-  },
-  "devDependencies": {
-    "babel-jest": "21.2.0",
-    "babel-preset-react-native": "4.0.0",
-    "jest": "21.2.1",
-    "react-test-renderer": "16.0.0-alpha.12"
-  },
-  "jest": {
-    "preset": "react-native"
-  }
+	"name": "AnalysisAndroid",
+	"version": "0.0.1",
+	"private": true,
+	"scripts": {
+		"start": "node node_modules/react-native/local-cli/cli.js start",
+		"test": "jest"
+	},
+	"dependencies": {
+		"native-echarts": "^0.4.0",
+		"react": "16.0.0-alpha.12",
+		"react-native": "0.46.1",
+		"react-native-calendars": "^1.16.1",
+		"react-native-vector-icons": "^4.4.3",
+		"react-navigation": "^1.0.0-beta.22"
+	},
+	"devDependencies": {
+		"babel-jest": "22.0.4",
+		"babel-preset-react-native": "4.0.0",
+		"jest": "22.0.4",
+		"react-test-renderer": "16.0.0-alpha.12"
+	},
+	"jest": {
+		"preset": "react-native"
+	}
 }

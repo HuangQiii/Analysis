@@ -8,6 +8,7 @@ import Services from '../pages/Services';
 import Member from '../pages/Member';
 import Service from '../pages/Service';
 import Target from '../pages/Target';
+import Calendar from '../pages/Calendar';
 import SelectBurnDown from '../pages/SelectBurnDown';
 import SelectAccumulativeFlowGraph from '../pages/SelectAccumulativeFlowGraph';
 
@@ -73,6 +74,7 @@ const App = StackNavigator(
         //         headerMode: 'none'
         //     }
         // },
+        Calendar: { screen: Calendar },
         Home: {
             screen: TabContainer,
             navigationOptions: {
