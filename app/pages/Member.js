@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, ListView, NativeModules } from 'react-native';
+import { View, StyleSheet, ListView, NativeModules, ToastAndroid, RefreshControl } from 'react-native';
 import List from '../components/List';
 import Button from '../components/Button';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 let url = 'http://gateway.devops.saas.hand-china.com';
-let token = 'Bearer 877dcc6b-bddf-4405-a5d7-04e8a4a7c534';
+let token = 'Bearer 15c3e72a-71ce-4aa6-80ae-8fbaba30022c';
 export default class Member extends Component {
 
     static navigationOptions = ({ navigation }) => ({
@@ -37,6 +37,7 @@ export default class Member extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            refreshing: false,
             dataSource: new ListView.DataSource({ rowHasChanged: (row1, row2) => row1 !== row2 }),
         };
     }
@@ -54,8 +55,12 @@ export default class Member extends Component {
             .then((response) => response.json())
             .then((responseData) => {
                 this.setState({
+                    refreshing: false,
                     dataSource: this.state.dataSource.cloneWithRows(responseData)
                 })
+            })
+            .catch((err) => {
+                ToastAndroid.show('加载失败,请检查网络', ToastAndroid.SHORT)
             })
     }
 
@@ -78,6 +83,15 @@ export default class Member extends Component {
             <View style={styles.container}>
                 <View style={{ height: 8, borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.08)' }}></View>
                 <ListView
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={this.state.refreshing}
+                            onRefresh={() => {
+                                this.setState({ refreshing: true });
+                                this.getData()
+                            }}
+                        />
+                    }
                     dataSource={this.state.dataSource}
                     renderRow={this.renderList.bind(this)}
                 />

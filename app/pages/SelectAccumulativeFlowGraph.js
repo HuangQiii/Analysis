@@ -5,7 +5,7 @@ import Button from '../components/Button';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 let url = 'http://gateway.devops.saas.hand-china.com';
-let token = 'Bearer 877dcc6b-bddf-4405-a5d7-04e8a4a7c534';
+let token = 'Bearer 15c3e72a-71ce-4aa6-80ae-8fbaba30022c';
 
 export default class SelectAccumulativeFlowGraph extends Component {
 
@@ -59,11 +59,13 @@ export default class SelectAccumulativeFlowGraph extends Component {
     }
 
     renderList(list) {
+        console.log(this.props.navigation);
         return (
             <List
                 text={list.name}
                 bgColor={'rgba(255,255,255,0.87)'}
                 borderBottom={true}
+                isSelected={list.id === this.props.navigation.state.params.sprint.id ? true : false}
                 rightIconName={'md-checkmark'}
                 iconColor={'#3F51B5'}
                 onPress={() => {

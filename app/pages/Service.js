@@ -8,7 +8,7 @@ import PRETEND_CHART_DATA from '../constants/PretendData';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 let url = 'http://gateway.devops.saas.hand-china.com';
-let token = 'Bearer 877dcc6b-bddf-4405-a5d7-04e8a4a7c534';
+let token = 'Bearer 15c3e72a-71ce-4aa6-80ae-8fbaba30022c';
 
 const PRE_PRO = [
     { id: 0, name: '服务提交次数/失败次数', color: 'rgba(77,144,254,1)' },
@@ -56,15 +56,22 @@ export default class FirstPage extends Component {
         };
     }
 
-    componentDidMount() {
+    componentWillMount() {
         DeviceEventEmitter.addListener('chooseType', (type) => {
             this.setState({
                 type: type,
             });
             this.changeType(type);
         });
+    }
+
+    componentDidMount() {
         this.changeType();
         this.getData();
+    }
+
+    componentWillUnmount() {
+        DeviceEventEmitter.removeAllListeners('chooseType');
     }
 
     getData() {

@@ -162,7 +162,6 @@ App.router.getStateForAction = (action, state) => {
 class Router extends Component {
     constructor(props, context) {
         super(props, context);
-        console.log('app props: ', this.props);
     }
 
     getProps() {

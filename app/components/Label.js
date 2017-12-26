@@ -14,7 +14,7 @@ const Label = ({
 }) => (
         <View style={{ flexDirection: 'row', marginTop: marginTop }}>
             <Text style={[styles.fontNormal, { marginTop: 1 }]}>{text}</Text>
-            <Text style={[styles.fontNormal, { fontSize: 24, marginTop: -8, marginLeft: 8, marginRight: 8, fontWeight: '500', color: '#3F51B5' }]}>{number}</Text>
+            <Text style={[styles.fontNormal, { fontSize: 24, marginTop: -8, marginLeft: 6, marginRight: 6, fontWeight: '500', color: '#3F51B5' }]}>{number}</Text>
             <Text style={[styles.fontNormal, { fontSize: 10, color: 'rgba(0,0,0,0.43)', marginTop: 5 }]}>{unit}</Text>
         </View>
     );

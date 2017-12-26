@@ -4,7 +4,6 @@ import Router from './containers/app';
 class Root extends Component {
     constructor(props, context) {
         super(props);
-        console.log('root props: ', this.props);
     }
 
     render() {
