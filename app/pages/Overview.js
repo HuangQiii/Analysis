@@ -7,7 +7,7 @@ import Echarts from 'native-echarts';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 let url = 'http://gateway.devops.saas.hand-china.com';
-let token = 'Bearer 15c3e72a-71ce-4aa6-80ae-8fbaba30022c';
+let token = 'Bearer 1d4a287d-cde5-4d85-8507-299d8c66c157';
 
 const { width, height } = Dimensions.get('window');
 export default class Overview extends Component {
@@ -87,7 +87,12 @@ export default class Overview extends Component {
     }
 
     componentDidMount() {
-        this.getData()
+        NativeModules.NativeManager.getConfigData((back) => {
+            url = back.mainUrl;
+            token = back.token;
+            this.getData();
+        });
+        //this.getData()
     }
 
     componentWillUnmount() {
@@ -358,7 +363,7 @@ export default class Overview extends Component {
                                 value={this.state.burnDownChartIdeal.toString()}
                             />
                             <View style={{ flexDirection: 'row', height: 220, marginTop: -30, marginLeft: -12, }}>
-                                <Echarts option={this.state.burnDownOption} height={250} width={width} appPath={this.props.screenProps.appPath} onPress={(param) => { this.handleBurnDownPress(param) }} />
+                                <Echarts option={this.state.burnDownOption} height={250} width={width} appPath={this.props.screenProps.appPath} name={this.props.screenProps.name} onPress={(param) => { this.handleBurnDownPress(param) }} />
                             </View>
                         </View>
                     </View>
@@ -403,7 +408,7 @@ export default class Overview extends Component {
                                 color={'#F953BA'}
                             />
                             <View style={{ flexDirection: 'row', height: 220, marginTop: -30, marginLeft: -12, }}>
-                                <Echarts option={this.state.accumulativeFlowGraphOption} height={250} width={width} appPath={this.props.screenProps.appPath} onPress={(param) => { this.handleAccumulativeFlowGraphPress(param) }} />
+                                <Echarts option={this.state.accumulativeFlowGraphOption} height={250} width={width} appPath={this.props.screenProps.appPath} name={this.props.screenProps.name} onPress={(param) => { this.handleAccumulativeFlowGraphPress(param) }} />
                             </View>
                         </View>
                     </View>

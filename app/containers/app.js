@@ -74,7 +74,7 @@ const App = StackNavigator(
         //         headerMode: 'none'
         //     }
         // },
-        Calendar: { screen: Calendar },
+
         Home: {
             screen: TabContainer,
             navigationOptions: {
@@ -90,6 +90,7 @@ const App = StackNavigator(
         Target: { screen: Target },
         SelectBurnDown: { screen: SelectBurnDown },
         SelectAccumulativeFlowGraph: { screen: SelectAccumulativeFlowGraph },
+        Calendar: { screen: Calendar },
     },
     {
         headerMode: 'screen',
@@ -171,6 +172,7 @@ class Router extends Component {
             proId: this.props.proId,
             orgId: this.props.orgId,
             appPath: this.props.appPath,
+            name: this.props.name
         }
     }
 

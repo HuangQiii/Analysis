@@ -1,7 +1,8 @@
 import React, { Component, } from 'react';
-import { View, StyleSheet, ListView, NativeModules, DeviceEventEmitter, TextInput } from 'react-native';
+import { View, StyleSheet, ListView, NativeModules, DeviceEventEmitter, TextInput, TouchableOpacity, Text } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
+
 
 export default class SelectCalendar extends Component {
 
@@ -25,66 +26,135 @@ export default class SelectCalendar extends Component {
         this.state = {
             from: '',
             to: '',
-            now:'from'
+            nowDate: '',
+            now: 'from',
+            selected: '',
+            markedDates: {},
+            min: '',
+            max: '',
         };
     }
 
+    componentDidMount() {
+        this.init();
+    }
+
+    init() {
+        if (this.props.navigation.state.params && this.props.navigation.state.params.from && this.props.navigation.state.params.to) {
+            this.setState({
+                from: this.props.navigation.state.params.from,
+                to: this.props.navigation.state.params.to,
+            });
+        }
+        let nowDate = new Date();
+        let nowDateStr = nowDate.getFullYear() + '-' + (nowDate.getMonth() + 1) + '-' + nowDate.getDate();
+        this.setState({
+            nowDate: nowDateStr,
+            maxDate: nowDate
+        });
+    }
+
+    postTimes() {
+        DeviceEventEmitter.emit('chooseTime', this.state.from, this.state.to);
+        this.props.navigation.dispatch({
+            key: 'Service',
+            type: 'BcakToCurrentScreen',
+            routeName: 'Service',
+        });
+    }
 
     render() {
+
         return (
             <View style={styles.container}>
-                <TextInput
-                    placeholder={'起始时间'}
-                    value={this.state.from}
-                />
-                <TextInput
-                    placeholder={'结束时间'}
-                    value={this.state.to}
-                />
+                <View style={{ backgroundColor: 'white' }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', height: 50 }}>
+                        <TouchableOpacity
+                            onPress={() => this.setState({ now: 'from' })}
+                        >
+                            <View style={[styles.box, this.state.now === 'from' ? { borderColor: 'gray' } : { borderColor: 'transparent' }]}>
+                                <Text>From:  {this.state.from}</Text>
+                            </View>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() => this.setState({ now: 'to' })}
+                        >
+                            <View style={[styles.box, this.state.now === 'to' ? { borderColor: 'gray' } : { borderColor: 'transparent' }]}>
+                                <Text>To:  {this.state.to}</Text>
+                            </View>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={{ justifyContent: 'center', alignItems: 'center', height: 50 }}>
+                        <TouchableOpacity
+                            onPress={() => this.postTimes()}
+                        >
+                            <View style={{ paddingTop: 2, paddingBottom: 2, paddingLeft: 10, paddingRight: 10, backgroundColor: 'grey' }}>
+                                <Text style={{ color: 'white', fontSize: 14 }}>确定</Text>
+                            </View>
+                        </TouchableOpacity>
+                    </View>
+                </View>
                 <Calendar
                     markedDates={{
-                        '2017-12-11': { selected: true },
-                        '2017-12-26': { marked: true },
+                        [this.state.from]: { selected: true },
+                        [this.state.to]: { selected: true }
                     }}
-                    // Initially visible month. Default = Date()
-                    //current={'2012-03-01'}
-                    // Minimum date that can be selected, dates before minDate will be grayed out. Default = undefined
-                    //minDate={'2012-05-10'}
-                    // Maximum date that can be selected, dates after maxDate will be grayed out. Default = undefined
-                    maxDate={'2017-12-26'}
-                    // Handler which gets executed on day press. Default = undefined
+                    minDate={this.state.minDate}
+                    maxDate={this.state.maxDate}
                     onDayPress={(day) => {
-                        if(this.state.now != 'from'){
+                        if (this.state.from === '') {
                             this.setState({
-                                to:day.dataString
+                                from: day.dateString,
+                                now: 'to'
                             });
-                        }else{
-                            this.setState({
-                            from:day.dateString
-                        })
+                        } else if (this.state.from != '' && this.state.to === '') {
+                            if (this.state.from < day.dateString) {
+                                this.setState({
+                                    to: day.dateString
+                                })
+                            } else {
+                                let to = this.state.from
+                                this.setState({
+                                    from: day.dateString,
+                                    to: to
+                                })
+                            }
+
+                        } else {
+                            if (this.state.now === 'from') {
+                                let from = this.state.from;
+                                let to = this.state.to;
+                                if (day.dateString <= to) {
+                                    this.setState({
+                                        from: day.dateString
+                                    });
+                                } else {
+                                    this.setState({
+                                        to: day.dateString,
+                                        from: to
+                                    });
+                                }
+
+                            } else {
+                                let from = this.state.from;
+                                let to = this.state.to;
+                                if (day.dateString >= from) {
+                                    this.setState({
+                                        to: day.dateString
+                                    })
+                                } else {
+                                    this.setState({
+                                        from: day.dateString,
+                                        to: from
+                                    });
+                                }
+
+                            }
                         }
-                        
                     }
-                    }   
-                    // Month format in calendar title. Formatting values: http://arshaw.com/xdate/#Formatting
+                    }
                     monthFormat={'yyyy MM'}
-                    // Handler which gets executed when visible month changes in calendar. Default = undefined
-                    //onMonthChange={(month) => { console.log('month changed', month) }}
-                    // Hide month navigation arrows. Default = false
-                    //hideArrows={true}
-                    // Replace default arrows with custom ones (direction can be 'left' or 'right')
-                    //renderArrow={(direction) => (<Arrow />)}
-                    // Do not show days of other months in month page. Default = false
                     hideExtraDays={true}
-                // If hideArrows=false and hideExtraDays=false do not switch month when tapping on greyed out
-                // day from another month that is visible in calendar page. Default = false
-                //disableMonthChange={true}
-                // If firstDay=1 week starts from Monday. Note that dayNames and dayNamesShort should still start from Sunday.
-                //firstDay={1}
-                // Hide day names. Default = false
-                //hideDayNames={true}
-                // Show week numbers to the left. Default = false
-                //showWeekNumbers={true}
                 />
             </View >
         );
@@ -96,5 +166,20 @@ var styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#F1F1F2',
         flexDirection: 'column'
+    },
+    box: {
+        // height: 40
+        borderWidth: 1,
+        width: 150,
+        height: 30,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    calendar: {
+        borderTopWidth: 1,
+        paddingTop: 5,
+        borderBottomWidth: 1,
+        borderColor: '#eee',
+        height: 350
     },
 });

@@ -5,7 +5,7 @@ import Button from '../components/Button';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 let url = 'http://gateway.devops.saas.hand-china.com';
-let token = 'Bearer 15c3e72a-71ce-4aa6-80ae-8fbaba30022c';
+let token = 'Bearer 1d4a287d-cde5-4d85-8507-299d8c66c157';
 
 export default class Services extends Component {
 
