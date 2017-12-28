@@ -8,7 +8,7 @@ import PRETEND_CHART_DATA from '../constants/PretendData';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 let url = 'http://gateway.devops.saas.hand-china.com';
-let token = 'Bearer 1d4a287d-cde5-4d85-8507-299d8c66c157';
+let token = 'Bearer b32a0b4a-7238-4df6-b505-3bec2c167085';
 
 const PRE_PRO = [
     { id: 0, name: '服务提交次数/失败次数', color: 'rgba(77,144,254,1)' },
@@ -97,10 +97,12 @@ export default class FirstPage extends Component {
         })
             .then((response) => response.json())
             .then((responseData) => {
-                this.setState({
-                    submit: responseData.pushNum,
-                    build: responseData.pipelineAllNum
-                })
+                if (responseData.error === undefined) {
+                    this.setState({
+                        submit: responseData.pushNum,
+                        build: responseData.pipelineAllNum
+                    })
+                }
             })
     };
 
@@ -128,80 +130,92 @@ export default class FirstPage extends Component {
                 .then((response) => response.json())
                 .then((responseData) => {
                     console.log(responseData)
-                    this.setState({
-                        option: {
-                            animation: true,
-                            tooltip: {
-                                trigger: 'axis',
-                                showContent: true,
-                                formatter: function (params, ticket, callback) {
-                                    window.postMessage(JSON.stringify(params));
-                                }
+
+                    if (responseData.error === undefined) {
+                        console.log(responseData)
+                        this.setState({
+                            option: {
+                                animation: true,
+                                tooltip: {
+                                    trigger: 'axis',
+                                    showContent: true,
+                                    formatter: function (params, ticket, callback) {
+                                        window.postMessage(JSON.stringify(params));
+                                    }
+                                },
+                                xAxis: [
+                                    {
+                                        boundaryGap: false,
+                                        data: responseData["x-data"]
+                                    }
+                                ],
+                                yAxis: [
+                                    {
+                                        type: 'value',
+                                    }
+                                ],
+                                color: ['rgba(77,144,254,1)', 'rgba(0,0,0,0.26)'],
+                                series: [
+                                    {
+                                        name: '服务提交次数',
+                                        type: 'line',
+                                        data: responseData["y-data"]
+                                    }
+                                ]
                             },
-                            xAxis: [
-                                {
-                                    boundaryGap: false,
-                                    data: responseData["x-data"]
-                                }
-                            ],
-                            yAxis: [
-                                {
-                                    type: 'value',
-                                }
-                            ],
-                            color: ['rgba(77,144,254,1)', 'rgba(0,0,0,0.26)'],
-                            series: [
-                                {
-                                    name: '服务提交次数',
-                                    type: 'line',
-                                    data: responseData["y-data"]
-                                }
-                            ]
-                        },
-                    })
+                        })
+                    }
                 })
                 .catch((err) => {
                     ToastAndroid.show('加载失败,请检查网络', ToastAndroid.SHORT)
                 })
         } else if (type === 1) {
-            fetch(url + '/provide/v1/pipeline/pipelineDetail?projectId=' + this.props.screenProps.proId + '&serviceId=' + this.props.navigation.state.params.service.id + '&startDate=' + startDate + '&endDate=' + endDate + '&type=time', {
+            fetch(url + '/provide/v1/pipeline/successFailDetail?projectId=' + this.props.screenProps.proId + '&serviceId=' + this.props.navigation.state.params.service.id + '&startDate=' + startDate + '&endDate=' + endDate + '&type=time', {
                 headers: {
                     "Authorization": token
                 }
             })
                 .then((response) => response.json())
                 .then((responseData) => {
-                    this.setState({
-                        option: {
-                            animation: true,
-                            tooltip: {
-                                trigger: 'axis',
-                                showContent: true,
-                                formatter: function (params, ticket, callback) {
-                                    window.postMessage(JSON.stringify(params));
-                                }
+                    console.log(responseData)
+                    if (responseData.error === undefined) {
+                        this.setState({
+                            option: {
+                                animation: true,
+                                tooltip: {
+                                    trigger: 'axis',
+                                    showContent: true,
+                                    formatter: function (params, ticket, callback) {
+                                        window.postMessage(JSON.stringify(params));
+                                    }
+                                },
+                                xAxis: [
+                                    {
+                                        boundaryGap: false,
+                                        data: responseData["x-data"]
+                                    }
+                                ],
+                                yAxis: [
+                                    {
+                                        type: 'value',
+                                    }
+                                ],
+                                color: ['rgba(27,193,35,1)', 'rgba(0,0,0,0.26)'],
+                                series: [
+                                    {
+                                        name: '服务构建次数',
+                                        type: 'line',
+                                        data: responseData["success-data"]
+                                    },
+                                    {
+                                        name: '服务构建失败次数',
+                                        type: 'line',
+                                        data: responseData["failed-data"]
+                                    }
+                                ]
                             },
-                            xAxis: [
-                                {
-                                    boundaryGap: false,
-                                    data: responseData["x-data"]
-                                }
-                            ],
-                            yAxis: [
-                                {
-                                    type: 'value',
-                                }
-                            ],
-                            color: ['rgba(27,193,35,1)', 'rgba(0,0,0,0.26)'],
-                            series: [
-                                {
-                                    name: '服务构建次数',
-                                    type: 'line',
-                                    data: responseData["y-data"]
-                                }
-                            ]
-                        },
-                    })
+                        })
+                    }
                 })
                 .catch((err) => {
                     ToastAndroid.show('加载失败,请检查网络', ToastAndroid.SHORT)
@@ -257,10 +271,16 @@ export default class FirstPage extends Component {
 
     handlePressServer(param) {
         console.log(param)
-        if (param instanceof Array && param[0] != undefined) {
+        if (param instanceof Array && this.state.type === 0 && param[0] != undefined) {
             this.setState({
                 serverTime: param[0].name,
                 server1: param[0].value,
+            });
+        } else if (param instanceof Array && this.state.type === 1 && param[0] != undefined && param[1] != undefined) {
+            this.setState({
+                serverTime: param[0].name,
+                server1: param[0].value,
+                server2: param[1].value,
             });
         }
     }
@@ -377,13 +397,13 @@ export default class FirstPage extends Component {
                             <View style={{ flex: 1 }}>
                                 <Text style={styles.fontNormal}>数据采集时间</Text>
                             </View>
-                            <Text>{this.state.serverTime}</Text>
+                            <Text>{this.state.serverTime != '' ? this.state.serverTime.slice(0, 4) + '-' + this.state.serverTime.slice(4, 6) + '-' + this.state.serverTime.slice(6, -2) + ' ' + this.state.serverTime.slice(-2) + '时' : ''}</Text>
                         </View>
                         {
                             this.state.type === 0 &&
                             <Line
                                 text={PRE_PRO[this.state.type].name.slice(0, 6)}
-                                value={this.state.server1.toString()}
+                                value={this.state.server1 != undefined ? this.state.server1.toString() : ''}
                                 color={COLOR[this.state.type]}
                             />
                         }
@@ -392,12 +412,12 @@ export default class FirstPage extends Component {
                             <View>
                                 <Line
                                     text={PRE_PRO[this.state.type].name.slice(0, 6)}
-                                    value={this.state.server1.toString()}
+                                    value={this.state.server1 != undefined ? this.state.server1.toString() : ''}
                                     color={COLOR[this.state.type]}
                                 />
                                 <Line
                                     text={PRE_PRO[this.state.type].name.slice(0, 4) + PRE_PRO[this.state.type].name.slice(-4)}
-                                    value={this.state.server2.toString()}
+                                    value={this.state.server2 != undefined ? this.state.server2.toString() : ''}
                                 />
                             </View>
                         }

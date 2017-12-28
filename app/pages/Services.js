@@ -5,7 +5,7 @@ import Button from '../components/Button';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 let url = 'http://gateway.devops.saas.hand-china.com';
-let token = 'Bearer 1d4a287d-cde5-4d85-8507-299d8c66c157';
+let token = 'Bearer b32a0b4a-7238-4df6-b505-3bec2c167085';
 
 export default class Services extends Component {
 
@@ -24,13 +24,7 @@ export default class Services extends Component {
         ),
         headerRight: (
             <Icon.Button
-                name="md-checkmark"
-                color="transparent"
                 backgroundColor="transparent"
-                underlayColor="transparent"
-                activeOpacity={1}
-                onPress={() => {
-                }}
             />
         )
     });
@@ -55,27 +49,29 @@ export default class Services extends Component {
         })
             .then((response) => response.json())
             .then((responseData) => {
-                this.setState({
-                    refreshing: false,
-                    dataSource: this.state.dataSource.cloneWithRows(responseData)
-                })
+                if (responseData.error === undefined) {
+                    this.setState({
+                        refreshing: false,
+                        dataSource: this.state.dataSource.cloneWithRows(responseData)
+                    })
+                }
             })
             .catch((err) => {
                 ToastAndroid.show('加载失败,请检查网络', ToastAndroid.SHORT)
             })
     }
 
-    renderList(list) {
+    renderList(service) {
         return (
             <List
-                text={list.serviceName}
+                text={service.serviceName}
                 bgColor={'rgba(255,255,255,0.87)'}
                 borderBottom={true}
                 isSelected={true}
                 rightIconName={'ios-arrow-forward'}
                 iconColor={'rgba(0,0,0,0.54)'}
                 onPress={() => {
-                    this.props.navigation.navigate('Service', { service: list })
+                    this.props.navigation.navigate('Service', { service: service })
                 }}
             />
         );

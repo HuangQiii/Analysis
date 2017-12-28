@@ -4,7 +4,7 @@ import { ViewPropTypes, Text, TouchableOpacity, StyleSheet, View } from 'react-n
 
 const propTypes = {
     text: PropTypes.string,
-    number: PropTypes.number,
+    number: PropTypes.string,
     unit: PropTypes.string,
     marginTop: PropTypes.number,
 };

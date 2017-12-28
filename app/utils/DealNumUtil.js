@@ -1,11 +1,15 @@
 const dealNum = (num, type) => {
-    if (type === '%') {
-        return num.toFixed(2) * 100;
+    if (num === '') {
+        return ''
     } else {
-        if (Math.floor(num) === num) {
-            return num;
+        if (type === '%') {
+            return num.toFixed(2) * 100 + '';
         } else {
-            return num.toFixed(1) * 1;
+            if (Math.floor(num) === num) {
+                return num + '';
+            } else {
+                return num.toFixed(1) * 1 + '';
+            }
         }
     }
 };

@@ -7,7 +7,7 @@ import Echarts from 'native-echarts';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 let url = 'http://gateway.devops.saas.hand-china.com';
-let token = 'Bearer 1d4a287d-cde5-4d85-8507-299d8c66c157';
+let token = 'Bearer b32a0b4a-7238-4df6-b505-3bec2c167085';
 
 const { width, height } = Dimensions.get('window');
 export default class Overview extends Component {
@@ -27,13 +27,7 @@ export default class Overview extends Component {
         ),
         headerRight: (
             <Icon.Button
-                name="md-checkmark"
-                color="transparent"
                 backgroundColor="transparent"
-                underlayColor="transparent"
-                activeOpacity={1}
-                onPress={() => {
-                }}
             />
         )
     });
@@ -44,19 +38,18 @@ export default class Overview extends Component {
         this.state = {
             refreshing: false,
 
-            getPlanDoneProgress: 0,
-            getChangeAverageTime: 0,
-            getBugAverageTime: 0,
-            getChangeDoneProgress: 0,
-
-            burnDownOption: {},
-            accumulativeFlowGraphOption: {},
+            getPlanDoneProgress: '',
+            getChangeAverageTime: '',
+            getBugAverageTime: '',
+            getChangeDoneProgress: '',
 
             burnDownChartSprint: {},
+            burnDownOption: {},
             burnDownChartActual: '',
             burnDownChartIdeal: '',
 
             accumulativeFlowGraphSprint: {},
+            accumulativeFlowGraphOption: {},
             accumulativeFlowGraph1: '',
             accumulativeFlowGraph2: '',
             accumulativeFlowGraph3: '',
@@ -72,27 +65,22 @@ export default class Overview extends Component {
                 routeName: 'Organization',
             });
         }
-        DeviceEventEmitter.addListener('chooseBurnDown', (list) => {
-            this.getBurnDownData(list.id);
+        DeviceEventEmitter.addListener('chooseBurnDown', (sprint) => {
+            this.getBurnDownData(sprint.id);
             this.setState({
-                burnDownChartSprint: list
+                burnDownChartSprint: sprint
             });
         });
-        DeviceEventEmitter.addListener('chooseAccumulativeFlowGraph', (list) => {
-            this.getAccumulativeFlowGraphData(list.id);
+        DeviceEventEmitter.addListener('chooseAccumulativeFlowGraph', (sprint) => {
+            this.getAccumulativeFlowGraphData(sprint.id);
             this.setState({
-                accumulativeFlowGraphSprint: list
+                accumulativeFlowGraphSprint: sprint
             });
         });
     }
 
     componentDidMount() {
-        NativeModules.NativeManager.getConfigData((back) => {
-            url = back.mainUrl;
-            token = back.token;
-            this.getData();
-        });
-        //this.getData()
+        this.getData()
     }
 
     componentWillUnmount() {
@@ -113,34 +101,44 @@ export default class Overview extends Component {
         })
             .then((response) => response.json())
             .then((responseData) => {
-                this.setState({
-                    refreshing: false,
-                    getPlanDoneProgress: responseData.getPlanDoneProgress,
-                    getChangeAverageTime: responseData.getChangeAverageTime,
-                    getBugAverageTime: responseData.getBugAverageTime,
-                    getChangeDoneProgress: responseData.getChangeDoneProgress
-                })
+                if (responseData.error === undefined) {
+                    this.setState({
+                        refreshing: false,
+                        getPlanDoneProgress: responseData.getPlanDoneProgress,
+                        getChangeAverageTime: responseData.getChangeAverageTime,
+                        getBugAverageTime: responseData.getBugAverageTime,
+                        getChangeDoneProgress: responseData.getChangeDoneProgress
+                    })
+                } else {
+                    ToastAndroid.show('加载失败，请稍后重试', ToastAndroid.SHORT)
+                }
             })
             .catch((err) => {
-                ToastAndroid.show('加载失败,请检查网络', ToastAndroid.SHORT)
+                ToastAndroid.show('加载失败,请查看网络链接', ToastAndroid.SHORT)
             });
     }
 
     getSprint() {
-        fetch(url + '/provide/v1/kanban/getCuttentSprints?projectId=' + this.props.screenProps.proId, {
+        fetch(url + '/provide/v1/kanban/getCurrentSprints?projectId=' + this.props.screenProps.proId, {
             headers: {
                 "Authorization": token
             }
         })
             .then((response) => response.json())
             .then((responseData) => {
-                this.setState({
-                    refreshing: false,
-                    burnDownChartSprint: responseData[0],
-                    accumulativeFlowGraphSprint: responseData[0]
-                })
-                this.getBurnDownData(responseData[0].id);
-                this.getAccumulativeFlowGraphData(responseData[0].id);
+                if (responseData.error === undefined) {
+                    if (responseData.length > 0) {
+                        this.setState({
+                            burnDownChartSprint: responseData[0],
+                            accumulativeFlowGraphSprint: responseData[0]
+                        })
+                        this.getBurnDownData(responseData[0].id);
+                        this.getAccumulativeFlowGraphData(responseData[0].id);
+                    }
+                    this.setState({
+                        refreshing: false,
+                    })
+                }
             })
     }
 
@@ -152,47 +150,54 @@ export default class Overview extends Component {
         })
             .then((response) => response.json())
             .then((responseData) => {
-                this.setState({
-                    burnDownChartActual: '',
-                    burnDownChartIdeal: '',
-                    burnDownOption: {
-                        animation: true,
-                        tooltip: {
-                            trigger: 'axis',
-                            showContent: true,
-                            formatter: function (params, ticket, callback) {
-                                window.postMessage(JSON.stringify(params));
-                            }
+                if (responseData.error === undefined) {
+                    this.setState({
+                        burnDownChartActual: '',
+                        burnDownChartIdeal: '',
+                        burnDownOption: {
+                            animation: true,
+                            tooltip: {
+                                trigger: 'axis',
+                                showContent: true,
+                                formatter: function (params, ticket, callback) {
+                                    window.postMessage(JSON.stringify(params));
+                                }
+                            },
+                            xAxis: [
+                                {
+                                    boundaryGap: false,
+                                    type: 'category',
+                                    data: responseData["x-data"]
+                                }
+                            ],
+                            yAxis: [
+                                {
+                                    type: 'value',
+                                }
+                            ],
+                            color: ['#F44336', 'rgba(0,0,0,0.26)'],
+                            series: [
+                                {
+                                    name: '实际值',
+                                    type: 'line',
+                                    data: responseData["y-data"],
+                                    smooth: true,
+                                },
+                                {
+                                    name: '期望值',
+                                    type: 'line',
+                                    data: responseData["y-total-data"]
+                                },
+                            ]
                         },
-                        xAxis: [
-                            {
-                                boundaryGap: false,
-                                type: 'category',
-                                data: responseData["x-data"]
-                            }
-                        ],
-                        yAxis: [
-                            {
-                                type: 'value',
-                            }
-                        ],
-                        color: ['#F44336', 'rgba(0,0,0,0.26)'],
-                        series: [
-                            {
-                                name: '实际值',
-                                type: 'line',
-                                data: responseData["y-data"],
-                                smooth: true,
-                            },
-                            {
-                                name: '期望值',
-                                type: 'line',
-                                data: responseData["y-total-data"]
-                            },
-                        ]
-                    },
-                })
+                    })
+                } else {
+                    ToastAndroid.show('加载失败，请稍后重试', ToastAndroid.SHORT)
+                }
             })
+            .catch((err) => {
+                ToastAndroid.show('加载失败,请检查网络', ToastAndroid.SHORT)
+            });
     }
 
     getAccumulativeFlowGraphData(sprintId) {
@@ -203,66 +208,73 @@ export default class Overview extends Component {
         })
             .then((response) => response.json())
             .then((responseData) => {
-                this.setState({
-                    accumulativeFlowGraph1: '',
-                    accumulativeFlowGraph2: '',
-                    accumulativeFlowGraph3: '',
-                    accumulativeFlowGraph4: '',
-                    accumulativeFlowGraphOption: {
-                        animation: true,
-                        tooltip: {
-                            trigger: 'axis',
-                            showContent: true,
-                            formatter: function (params, ticket, callback) {
-                                // alert(params[0].name)
-                                window.postMessage(JSON.stringify(params));
-                            }
-                        },
-                        xAxis: [
-                            {
-                                boundaryGap: false,
-                                data: responseData["x-data"]
-                            }
-                        ],
-                        yAxis: [
-                            {
-                                type: 'value',
-                            }
-                        ],
-                        color: ['#F4B400', '#FF7043', '#4D90FE', '#F953BA', '#1BC123', '#743BE7'],
-                        series: [
-                            {
-                                name: '完成',
-                                type: 'line',
-                                data: responseData["y-data"][0],
-                                smooth: true,
-                                // symbol: 'none'
+                if (responseData.error === undefined) {
+                    this.setState({
+                        accumulativeFlowGraph1: '',
+                        accumulativeFlowGraph2: '',
+                        accumulativeFlowGraph3: '',
+                        accumulativeFlowGraph4: '',
+                        accumulativeFlowGraphOption: {
+                            animation: true,
+                            tooltip: {
+                                trigger: 'axis',
+                                showContent: true,
+                                formatter: function (params, ticket, callback) {
+                                    // alert(params[0].name)
+                                    window.postMessage(JSON.stringify(params));
+                                }
                             },
-                            {
-                                name: '测试',
-                                type: 'line',
-                                data: responseData["y-data"][1],
-                                smooth: true,
-                                // symbol: 'none'
-                            },
-                            {
-                                name: '开发',
-                                type: 'line',
-                                data: responseData["y-data"][2],
-                                smooth: true,
-                                // symbol: 'none'
-                            },
-                            {
-                                name: '待开发',
-                                type: 'line',
-                                data: responseData["y-data"][3],
-                                smooth: true,
-                                // symbol: 'none'
-                            },
-                        ]
-                    }
-                })
+                            xAxis: [
+                                {
+                                    boundaryGap: false,
+                                    data: responseData["x-data"]
+                                }
+                            ],
+                            yAxis: [
+                                {
+                                    type: 'value',
+                                }
+                            ],
+                            color: ['#F4B400', '#FF7043', '#4D90FE', '#F953BA', '#1BC123', '#743BE7'],
+                            series: [
+                                {
+                                    name: '完成',
+                                    type: 'line',
+                                    data: responseData["y-data"][0],
+                                    smooth: true,
+                                    // symbol: 'none'
+                                },
+                                {
+                                    name: '测试',
+                                    type: 'line',
+                                    data: responseData["y-data"][1],
+                                    smooth: true,
+                                    // symbol: 'none'
+                                },
+                                {
+                                    name: '开发',
+                                    type: 'line',
+                                    data: responseData["y-data"][2],
+                                    smooth: true,
+                                    // symbol: 'none'
+                                },
+                                {
+                                    name: '待开发',
+                                    type: 'line',
+                                    data: responseData["y-data"][3],
+                                    smooth: true,
+                                    // symbol: 'none'
+                                },
+                            ]
+                        }
+                    })
+                } else {
+                    ToastAndroid.show('加载失败，请稍后重试', ToastAndroid.SHORT)
+                }
             })
+            .catch((err) => {
+                ToastAndroid.show('加载失败,请检查网络', ToastAndroid.SHORT)
+            });
     }
 
     handleBurnDownPress(param) {
@@ -302,7 +314,7 @@ export default class Overview extends Component {
                 <View style={styles.container}>
                     <View style={styles.panel}>
                         <View style={{ height: 38 }}>
-                            <Text style={[styles.fontNormal, { marginTop: -4 }]}>服务监控信息</Text>
+                            <Text style={[styles.fontNormal, { marginTop: -4 }]}>项目监控信息</Text>
                         </View>
                         <View style={[styles.serviceMonitoringData]}>
                             <View style={styles.count}>
@@ -342,7 +354,7 @@ export default class Overview extends Component {
                                 onPress={() => navigate('SelectBurnDown', { sprint: this.state.burnDownChartSprint })}
                             >
                                 <View style={{ height: 38, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <Text style={[styles.fontNormal, { color: 'rgba(0,0,0,0.54)', marginTop: -4 }]}>{this.state.burnDownChartSprint.name}</Text>
+                                    <Text style={[styles.fontNormal, { color: 'rgba(0,0,0,0.54)', marginTop: -4 }]}>{this.state.burnDownChartSprint && this.state.burnDownChartSprint.name ? this.state.burnDownChartSprint.name : '没有冲刺'}</Text>
                                     <Icon
                                         name="ios-arrow-forward"
                                         color="rgba(0,0,0,0.9)"
@@ -356,15 +368,18 @@ export default class Overview extends Component {
                             <Line
                                 text={'实际值'}
                                 color={'#F44336'}
-                                value={this.state.burnDownChartActual.toString()}
+                                value={this.state.burnDownChartActual != undefined ? dealNum(this.state.burnDownChartActual) : ''}
                             />
                             <Line
                                 text={'期望值'}
-                                value={this.state.burnDownChartIdeal.toString()}
+                                value={this.state.burnDownChartIdeal != undefined ? dealNum(this.state.burnDownChartIdeal) : ''}
                             />
-                            <View style={{ flexDirection: 'row', height: 220, marginTop: -30, marginLeft: -12, }}>
-                                <Echarts option={this.state.burnDownOption} height={250} width={width} appPath={this.props.screenProps.appPath} name={this.props.screenProps.name} onPress={(param) => { this.handleBurnDownPress(param) }} />
-                            </View>
+                            {
+                                this.state.burnDownChartSprint.id != undefined &&
+                                <View style={{ flexDirection: 'row', height: 220, marginTop: -30, marginLeft: -12, }}>
+                                    <Echarts option={this.state.burnDownOption} height={250} width={width} appPath={this.props.screenProps.appPath} name={this.props.screenProps.name} onPress={(param) => { this.handleBurnDownPress(param) }} />
+                                </View>
+                            }
                         </View>
                     </View>
                     <View style={styles.panel}>
@@ -374,7 +389,7 @@ export default class Overview extends Component {
                                 onPress={() => navigate('SelectAccumulativeFlowGraph', { sprint: this.state.accumulativeFlowGraphSprint })}
                             >
                                 <View style={{ height: 38, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <Text style={[styles.fontNormal, { color: 'rgba(0,0,0,0.54)', marginTop: -4 }]}>{this.state.accumulativeFlowGraphSprint.name}</Text>
+                                    <Text style={[styles.fontNormal, { color: 'rgba(0,0,0,0.54)', marginTop: -4 }]}>{this.state.accumulativeFlowGraphSprint && this.state.accumulativeFlowGraphSprint.name ? this.state.accumulativeFlowGraphSprint.name : '没有冲刺'}</Text>
                                     <Icon
                                         name="ios-arrow-forward"
                                         color="rgba(0,0,0,0.9)"
@@ -382,34 +397,36 @@ export default class Overview extends Component {
                                         backgroundColor="transparent"
                                         underlayColor="transparent"
                                         activeOpacity={1}
-                                        onPress={() => {
-                                        }}
                                     />
                                 </View>
                             </TouchableOpacity>
                             <Line
                                 text={'完成'}
-                                value={this.state.accumulativeFlowGraph1.toString()}
+                                value={this.state.accumulativeFlowGraph1 != undefined ? dealNum(this.state.accumulativeFlowGraph1) : ''}
                                 color={'#F4B400'}
                             />
                             <Line
                                 text={'开发'}
-                                value={this.state.accumulativeFlowGraph2.toString()}
+                                value={this.state.accumulativeFlowGraph2 != undefined ? dealNum(this.state.accumulativeFlowGraph2) : ''}
                                 color={'#FF7043'}
                             />
                             <Line
                                 text={'待开发'}
-                                value={this.state.accumulativeFlowGraph3.toString()}
+                                value={this.state.accumulativeFlowGraph3 != undefined ? dealNum(this.state.accumulativeFlowGraph3) : ''}
                                 color={'#4D90FE'}
                             />
                             <Line
                                 text={'需求'}
-                                value={this.state.accumulativeFlowGraph4.toString()}
+                                value={this.state.accumulativeFlowGraph4 != undefined ? dealNum(this.state.accumulativeFlowGraph4) : ''}
                                 color={'#F953BA'}
                             />
-                            <View style={{ flexDirection: 'row', height: 220, marginTop: -30, marginLeft: -12, }}>
-                                <Echarts option={this.state.accumulativeFlowGraphOption} height={250} width={width} appPath={this.props.screenProps.appPath} name={this.props.screenProps.name} onPress={(param) => { this.handleAccumulativeFlowGraphPress(param) }} />
-                            </View>
+                            {
+                                this.state.accumulativeFlowGraphSprint.id != undefined &&
+                                <View style={{ flexDirection: 'row', height: 220, marginTop: -30, marginLeft: -12, }}>
+                                    <Echarts option={this.state.accumulativeFlowGraphOption} height={250} width={width} appPath={this.props.screenProps.appPath} name={this.props.screenProps.name} onPress={(param) => { this.handleAccumulativeFlowGraphPress(param) }} />
+                                </View>
+                            }
+
                         </View>
                     </View>
                 </View >

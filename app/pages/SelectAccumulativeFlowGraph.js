@@ -1,11 +1,11 @@
 import React, { Component, } from 'react';
-import { View, StyleSheet, ListView, NativeModules, DeviceEventEmitter } from 'react-native';
+import { View, StyleSheet, ListView, NativeModules, DeviceEventEmitter, RefreshControl } from 'react-native';
 import List from '../components/List';
 import Button from '../components/Button';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 let url = 'http://gateway.devops.saas.hand-china.com';
-let token = 'Bearer 1d4a287d-cde5-4d85-8507-299d8c66c157';
+let token = 'Bearer b32a0b4a-7238-4df6-b505-3bec2c167085';
 
 export default class SelectAccumulativeFlowGraph extends Component {
 
@@ -13,13 +13,7 @@ export default class SelectAccumulativeFlowGraph extends Component {
         title: `累计流图：选择冲刺`,
         headerRight: (
             <Icon.Button
-                name="md-checkmark"
-                color="transparent"
                 backgroundColor="transparent"
-                underlayColor="transparent"
-                activeOpacity={1}
-                onPress={() => {
-                }}
             />
         )
     });
@@ -27,6 +21,7 @@ export default class SelectAccumulativeFlowGraph extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            refreshing: false,
             dataSource: new ListView.DataSource({ rowHasChanged: (row1, row2) => row1 !== row2 }),
         };
     }
@@ -36,21 +31,29 @@ export default class SelectAccumulativeFlowGraph extends Component {
     }
 
     getData() {
-        fetch(url + '/provide/v1/kanban/getCuttentSprints?projectId=' + this.props.screenProps.proId, {
+        fetch(url + '/provide/v1/kanban/getCurrentSprints?projectId=' + this.props.screenProps.proId, {
             headers: {
                 "Authorization": token
             }
         })
             .then((response) => response.json())
             .then((responseData) => {
-                this.setState({
-                    dataSource: this.state.dataSource.cloneWithRows(responseData)
-                })
+                if (responseData.error === undefined) {
+                    this.setState({
+                        refreshing: false,
+                        dataSource: this.state.dataSource.cloneWithRows(responseData)
+                    })
+                } else {
+                    this.setState({
+                        refreshing: false,
+                        dataSource: this.state.dataSource.cloneWithRows([])
+                    })
+                }
             })
     }
 
-    select(list) {
-        DeviceEventEmitter.emit('chooseAccumulativeFlowGraph', list);
+    select(sprint) {
+        DeviceEventEmitter.emit('chooseAccumulativeFlowGraph', sprint);
         this.props.navigation.dispatch({
             key: 'Home',
             type: 'BcakToCurrentScreen',
@@ -58,18 +61,18 @@ export default class SelectAccumulativeFlowGraph extends Component {
         });
     }
 
-    renderList(list) {
+    renderList(sprint) {
         console.log(this.props.navigation);
         return (
             <List
-                text={list.name}
+                text={sprint.name}
                 bgColor={'rgba(255,255,255,0.87)'}
                 borderBottom={true}
-                isSelected={list.id === this.props.navigation.state.params.sprint.id ? true : false}
+                isSelected={sprint.id === this.props.navigation.state.params.sprint.id ? true : false}
                 rightIconName={'md-checkmark'}
                 iconColor={'#3F51B5'}
                 onPress={() => {
-                    this.select(list)
+                    this.select(sprint)
                 }}
             />
         );
@@ -80,6 +83,15 @@ export default class SelectAccumulativeFlowGraph extends Component {
             <View style={styles.container}>
                 <View style={{ height: 8, borderBottomWidth: 1, borderBottomColor: 'rgba(0,0,0,0.08)' }}></View>
                 <ListView
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={this.state.refreshing}
+                            onRefresh={() => {
+                                this.setState({ refreshing: true });
+                                this.getData()
+                            }}
+                        />
+                    }
                     dataSource={this.state.dataSource}
                     renderRow={this.renderList.bind(this)}
                 />
