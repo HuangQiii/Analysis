@@ -78,7 +78,7 @@ const App = StackNavigator(
         Home: {
             screen: TabContainer,
             navigationOptions: {
-                headerTitle: '开发项目',
+                //headerTitle: '开发项目',
             }
         },
         Organization: {

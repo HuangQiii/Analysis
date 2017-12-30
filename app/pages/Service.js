@@ -20,20 +20,14 @@ const COLOR = ['rgba(77,144,254,1)', 'rgba(27,193,35,1)', 'rgba(255,153,21,1)', 
 const ARRAY_DATE = ['今天', '昨天', '近7天', '近30天'];
 
 const { width, height } = Dimensions.get('window');
-export default class FirstPage extends Component {
+export default class Service extends Component {
 
     static navigationOptions = ({ navigation }) => ({
         title: navigation.state.params.service.serviceName,
 
         headerRight: (
             <Icon.Button
-                name="md-checkmark"
-                color="transparent"
                 backgroundColor="transparent"
-                underlayColor="transparent"
-                activeOpacity={1}
-                onPress={() => {
-                }}
             />
         )
     });

@@ -5,7 +5,7 @@ import Button from '../components/Button';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 let url = 'http://gateway.devops.saas.hand-china.com';
-let token = 'Bearer b32a0b4a-7238-4df6-b505-3bec2c167085';
+let token = 'Bearer 2436de68-679d-4304-b709-4d0622d4b700';
 
 export default class Services extends Component {
 
@@ -22,6 +22,7 @@ export default class Services extends Component {
                 }}
             />
         ),
+        headerTitle: '开发项目',
         headerRight: (
             <Icon.Button
                 backgroundColor="transparent"

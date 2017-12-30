@@ -7,7 +7,7 @@ import Echarts from 'native-echarts';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 let url = 'http://gateway.devops.saas.hand-china.com';
-let token = 'Bearer b32a0b4a-7238-4df6-b505-3bec2c167085';
+let token = 'Bearer 2436de68-679d-4304-b709-4d0622d4b700';
 
 const { width, height } = Dimensions.get('window');
 export default class Overview extends Component {
@@ -25,6 +25,7 @@ export default class Overview extends Component {
                 }}
             />
         ),
+        headerTitle: '开发项目',
         headerRight: (
             <Icon.Button
                 backgroundColor="transparent"
@@ -36,6 +37,7 @@ export default class Overview extends Component {
         super(props);
 
         this.state = {
+            tip: '',
             refreshing: false,
 
             getPlanDoneProgress: '',
@@ -111,6 +113,7 @@ export default class Overview extends Component {
                     })
                 } else {
                     ToastAndroid.show('加载失败，请稍后重试', ToastAndroid.SHORT)
+                    this.setState({ tip: '加载失败，请稍后尝试下拉刷新' });
                 }
             })
             .catch((err) => {
@@ -300,18 +303,25 @@ export default class Overview extends Component {
     render() {
         const { navigate } = this.props.navigation;
         return (
-            <ScrollView
-                refreshControl={
-                    <RefreshControl
-                        refreshing={this.state.refreshing}
-                        onRefresh={() => {
-                            this.setState({ refreshing: true });
-                            this.getData()
-                        }}
-                    />
-                }
-            >
-                <View style={styles.container}>
+            <View style={styles.container}>
+                <ScrollView
+                    style={{ flex: 1 }}
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={this.state.refreshing}
+                            onRefresh={() => {
+                                this.setState({ refreshing: true });
+                                this.getData()
+                            }}
+                        />
+                    }
+                >
+                    {
+                        this.state.tip != '' &&
+                        <View style={[styles.panel, { paddingBottom: 12 }]}>
+                            <Text style={{ color: 'red' }}>{this.state.tip}</Text>
+                        </View>
+                    }
                     <View style={styles.panel}>
                         <View style={{ height: 38 }}>
                             <Text style={[styles.fontNormal, { marginTop: -4 }]}>项目监控信息</Text>
@@ -429,8 +439,8 @@ export default class Overview extends Component {
 
                         </View>
                     </View>
-                </View >
-            </ScrollView >
+                </ScrollView >
+            </View >
         );
     }
 }
