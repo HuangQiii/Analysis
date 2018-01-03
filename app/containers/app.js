@@ -172,7 +172,8 @@ class Router extends Component {
             proId: this.props.proId,
             orgId: this.props.orgId,
             appPath: this.props.appPath,
-            name: this.props.name
+            name: this.props.name,
+            showName: this.props.showName
         }
     }
 

@@ -6,13 +6,13 @@ import dealNum from '../utils/DealNumUtil';
 import Echarts from 'native-echarts';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-let url = 'http://gateway.devops.saas.hand-china.com';
-let token = 'Bearer 2436de68-679d-4304-b709-4d0622d4b700';
+let url = '';
+let token = '';
 
 const { width, height } = Dimensions.get('window');
 export default class Overview extends Component {
 
-    static navigationOptions = ({ navigation }) => ({
+    static navigationOptions = ({ navigation, screenProps }) => ({
         headerLeft: (
             <Icon.Button
                 name="md-menu"
@@ -25,7 +25,7 @@ export default class Overview extends Component {
                 }}
             />
         ),
-        headerTitle: '开发项目',
+        headerTitle: `${screenProps.showName}`,
         headerRight: (
             <Icon.Button
                 backgroundColor="transparent"
@@ -60,7 +60,7 @@ export default class Overview extends Component {
     }
 
     componentWillMount() {
-        if (this.props.screenProps.proId === '') {
+        if (this.props.screenProps.proId === '' || this.props.screenProps.proId === -1) {
             this.props.navigation.dispatch({
                 key: 'Organization',
                 type: 'ReplaceCurrentScreen',
@@ -248,21 +248,21 @@ export default class Overview extends Component {
                                     // symbol: 'none'
                                 },
                                 {
-                                    name: '测试',
+                                    name: '开发',
                                     type: 'line',
                                     data: responseData["y-data"][1],
                                     smooth: true,
                                     // symbol: 'none'
                                 },
                                 {
-                                    name: '开发',
+                                    name: '待开发',
                                     type: 'line',
                                     data: responseData["y-data"][2],
                                     smooth: true,
                                     // symbol: 'none'
                                 },
                                 {
-                                    name: '待开发',
+                                    name: '需求',
                                     type: 'line',
                                     data: responseData["y-data"][3],
                                     smooth: true,

@@ -4,8 +4,8 @@ import List from '../components/List';
 import Button from '../components/Button';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-let url = 'http://gateway.devops.saas.hand-china.com';
-let token = 'Bearer b32a0b4a-7238-4df6-b505-3bec2c167085';
+let url = '';
+let token = '';
 
 export default class SelectAccumulativeFlowGraph extends Component {
 

@@ -84,7 +84,7 @@ var option = {
 const { width, height } = Dimensions.get('window');
 export default class FirstPage extends Component {
 
-    static navigationOptions = ({ navigation }) => ({
+    static navigationOptions = ({ navigation, screenProps }) => ({
         title: `运营组织`,
         headerLeft: (
             <Icon.Button
@@ -98,6 +98,7 @@ export default class FirstPage extends Component {
                 }}
             />
         ),
+        headerTitle: `${screenProps.showName}`,
         headerRight: (
             <Icon.Button
                 name="md-checkmark"
@@ -232,17 +233,17 @@ export default class FirstPage extends Component {
                                 <Tab
                                     text={'近7天'}
                                     borderLeftWidth={1}
-                                    onPress={() => this.changeTime('近7天')}
+                                    //onPress={() => this.changeTime('近7天')}
                                     active={this.state.nowTime === '近7天'}
                                 />
                                 <Tab
                                     text={'近30天'}
-                                    onPress={() => this.changeTime('近30天')}
+                                    //onPress={() => this.changeTime('近30天')}
                                     active={this.state.nowTime === '近30天'}
                                 />
                                 <Tab
                                     text={'全年'}
-                                    onPress={() => this.changeTime('全年')}
+                                    //onPress={() => this.changeTime('全年')}
                                     active={this.state.nowTime === '全年'}
                                 />
                             </View>
@@ -288,7 +289,7 @@ export default class FirstPage extends Component {
                                 value={this.state.member2.toString()}
                             />
                             <View style={{ flexDirection: 'row', height: 220, marginTop: -30, marginLeft: -12, }}>
-                                <Echarts option={this.state.chart1} height={250} width={width} appPath={this.props.screenProps.appPath} onPress={(param) => { this.handlePressMember(param) }} />
+                                <Echarts option={this.state.chart1} height={250} width={width} appPath={this.props.screenProps.appPath} name={this.props.screenProps.name} onPress={(param) => { this.handlePressMember(param) }} />
                             </View>
                         </View>
                     </View>
@@ -301,17 +302,17 @@ export default class FirstPage extends Component {
                                 <Tab
                                     text={'近7天'}
                                     borderLeftWidth={1}
-                                    onPress={() => this.changeTime('近7天')}
+                                    //onPress={() => this.changeTime('近7天')}
                                     active={this.state.nowTime === '近7天'}
                                 />
                                 <Tab
                                     text={'近30天'}
-                                    onPress={() => this.changeTime('近30天')}
+                                    //onPress={() => this.changeTime('近30天')}
                                     active={this.state.nowTime === '近30天'}
                                 />
                                 <Tab
                                     text={'全年'}
-                                    onPress={() => this.changeTime('全年')}
+                                    //onPress={() => this.changeTime('全年')}
                                     active={this.state.nowTime === '全年'}
                                 />
                             </View>
@@ -355,7 +356,7 @@ export default class FirstPage extends Component {
                                 value={this.state.number}
                             />
                             <View style={{ flexDirection: 'row', height: 220, marginTop: -30, marginLeft: -12, }}>
-                                <Echarts option={this.state.chart} height={250} width={width} appPath={this.props.screenProps.appPath} onPress={(param) => { this.handlePressNumber(param) }} />
+                                <Echarts option={this.state.chart} height={250} width={width} appPath={this.props.screenProps.appPath} name={this.props.screenProps.name} onPress={(param) => { this.handlePressNumber(param) }} />
                             </View>
 
                         </View>

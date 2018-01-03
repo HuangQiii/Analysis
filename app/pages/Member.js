@@ -4,11 +4,11 @@ import List from '../components/List';
 import Button from '../components/Button';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-let url = 'http://gateway.devops.saas.hand-china.com';
-let token = 'Bearer 2436de68-679d-4304-b709-4d0622d4b700';
+let url = '';
+let token = '';
 export default class Member extends Component {
 
-    static navigationOptions = ({ navigation }) => ({
+    static navigationOptions = ({ navigation, screenProps }) => ({
         headerLeft: (
             <Icon.Button
                 name="md-menu"
@@ -21,7 +21,7 @@ export default class Member extends Component {
                 }}
             />
         ),
-        headerTitle: '开发项目',
+        headerTitle: `${screenProps.showName}`,
         headerRight: (
             <Icon.Button
                 backgroundColor="transparent"

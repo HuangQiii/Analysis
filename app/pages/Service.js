@@ -7,8 +7,8 @@ import Line from '../components/Line';
 import PRETEND_CHART_DATA from '../constants/PretendData';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-let url = 'http://gateway.devops.saas.hand-china.com';
-let token = 'Bearer b32a0b4a-7238-4df6-b505-3bec2c167085';
+let url = '';
+let token = '';
 
 const PRE_PRO = [
     { id: 0, name: '服务提交次数/失败次数', color: 'rgba(77,144,254,1)' },
@@ -123,8 +123,6 @@ export default class Service extends Component {
             })
                 .then((response) => response.json())
                 .then((responseData) => {
-                    console.log(responseData)
-
                     if (responseData.error === undefined) {
                         console.log(responseData)
                         this.setState({
@@ -391,7 +389,14 @@ export default class Service extends Component {
                             <View style={{ flex: 1 }}>
                                 <Text style={styles.fontNormal}>数据采集时间</Text>
                             </View>
-                            <Text>{this.state.serverTime != '' ? this.state.serverTime.slice(0, 4) + '-' + this.state.serverTime.slice(4, 6) + '-' + this.state.serverTime.slice(6, -2) + ' ' + this.state.serverTime.slice(-2) + '时' : ''}</Text>
+                            {
+                                this.state.type === 0 &&
+                                <Text>{this.state.serverTime != '' ? this.state.serverTime.slice(0, 4) + '-' + this.state.serverTime.slice(4, 6) + '-' + this.state.serverTime.slice(6, -2) + ' ' + this.state.serverTime.slice(-2) + '时' : ''}</Text>
+                            }
+                            {
+                                this.state.type === 1 &&
+                                <Text>{this.state.serverTime}</Text>
+                            }
                         </View>
                         {
                             this.state.type === 0 &&
@@ -417,7 +422,7 @@ export default class Service extends Component {
                         }
 
                         <View style={{ flexDirection: 'row', height: 220, marginTop: -30, marginLeft: -12, }}>
-                            <Echarts option={this.state.option} height={250} width={width} appPath={this.props.screenProps.appPath} onPress={(param) => { this.handlePressServer(param) }} />
+                            <Echarts option={this.state.option} height={250} width={width} appPath={this.props.screenProps.appPath} name={this.props.screenProps.name} onPress={(param) => { this.handlePressServer(param) }} />
                         </View>
 
                     </View>
